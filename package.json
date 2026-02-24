@@ -1,0 +1,48 @@
+{
+  "name": "@masatomakino/demo-showcase",
+  "version": "0.1.0",
+  "description": "Generate demo HTML pages from JS/TS source files using Vite",
+  "type": "module",
+  "main": "bin/CLI.js",
+  "bin": {
+    "demo-showcase": "bin/CLI.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://MasatoMakino@github.com/MasatoMakino/demo-showcase.git"
+  },
+  "files": [
+    "bin",
+    "template"
+  ],
+  "author": "MasatoMakino <unagiinu.g@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^14.0.0",
+    "glob": "^13.0.0",
+    "vite": "^6.0.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.0",
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-istanbul": "^4.0.0",
+    "typescript": "^5.7.0"
+  },
+  "scripts": {
+    "test": "vitest --run && npm run build && npm run testRun",
+    "test:watch": "vitest",
+    "coverage": "vitest --run --coverage",
+    "build": "tsc",
+    "watch": "tsc -W",
+    "testRun": "node ./bin/CLI.js build --srcDir ./demoSrc",
+    "pre-commit": "biome format --write --no-errors-on-unmatched --files-ignore-unknown=true",
+    "pre-push": "biome ci . && vitest --run"
+  },
+  "bugs": {
+    "url": "https://github.com/MasatoMakino/demo-showcase/issues"
+  },
+  "homepage": "https://github.com/MasatoMakino/demo-showcase#readme",
+  "directories": {
+    "doc": "docs"
+  }
+}

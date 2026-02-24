@@ -1,0 +1,45 @@
+import path from "node:path";
+import { createServer } from "vite";
+import { demoPlugin } from "./DemoPlugin.js";
+import { discoverDemoEntries } from "./entries.js";
+import type { InitializedOption } from "./Option.js";
+import { createDevConfig, mergeUserConfig } from "./ViteConfig.js";
+
+/**
+ * Start Vite dev server with demo page middleware.
+ */
+export async function devDemo(option: InitializedOption): Promise<void> {
+  const entries = discoverDemoEntries(option);
+  if (entries.length === 0) {
+    console.error(
+      `demo-showcase: No demo scripts found.\n` +
+        `Check that ${option.srcDir} contains files with prefix "${option.prefix}" (.js or .ts).`,
+    );
+    return;
+  }
+
+  const root = path.resolve(process.cwd());
+  const port = option.port ?? 3000;
+
+  let config = createDevConfig(root, port);
+
+  // Add custom demo plugin
+  config.plugins = [demoPlugin(option, entries)];
+
+  if (option.config) {
+    config = await mergeUserConfig(config, option.config);
+  }
+
+  const server = await createServer(config);
+  await server.listen();
+
+  const host = option.host ?? "localhost";
+  const openUrl = `http://${host}:${server.config.server.port}`;
+  console.log(`demo-showcase: Dev server running at ${openUrl}`);
+
+  if (option.open) {
+    server.openBrowser();
+  }
+
+  server.printUrls();
+}

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "node16",
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "./bin",
+    "moduleResolution": "node16",
+    "esModuleInterop": true,
+    "strict": true
+  },
+  "include": ["./src"]
+}
