@@ -1,5 +1,6 @@
 import path from "node:path";
 import { createServer } from "vite";
+import FullReload from "vite-plugin-full-reload";
 import { demoPlugin } from "./DemoPlugin.js";
 import { discoverDemoEntries } from "./entries.js";
 import type { InitializedOption } from "./Option.js";
@@ -23,8 +24,9 @@ export async function devDemo(option: InitializedOption): Promise<void> {
 
   let config = createDevConfig(root, port);
 
-  // Add custom demo plugin
-  config.plugins = [demoPlugin(option, entries)];
+  // Add custom demo plugin + full reload on JS/TS changes
+  const srcGlob = `${option.srcDir}/**/*.{js,ts}`;
+  config.plugins = [demoPlugin(option, entries), FullReload([srcGlob])];
 
   if (option.config) {
     config = await mergeUserConfig(config, option.config);
