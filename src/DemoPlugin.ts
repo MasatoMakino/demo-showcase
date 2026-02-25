@@ -21,6 +21,27 @@ export function demoPlugin(
       const srcDir = path.resolve(server.config.root, option.srcDir);
 
       server.watcher.add(srcDir);
+
+      // Watch directories imported by demo entry files.
+      // Middleware-generated HTML bypasses Vite's entry discovery,
+      // so imported modules are not automatically watched.
+      const importedDirs = collectImportedDirs(srcDir, demoEntries);
+      for (const dir of importedDirs) {
+        server.watcher.add(dir);
+      }
+
+      // Trigger full reload when watched import targets change.
+      // Skip declaration files to avoid spurious reloads from tsc output.
+      server.watcher.on("change", (filePath) => {
+        if (filePath.endsWith(".d.ts") || filePath.endsWith(".d.ts.map")) return;
+        for (const dir of importedDirs) {
+          if (filePath.startsWith(dir)) {
+            server.ws.send({ type: "full-reload", path: "*" });
+            return;
+          }
+        }
+      });
+
       server.watcher.on("add", (filePath) => {
         if (isDemoFile(filePath, srcDir, option.prefix)) {
           server.restart();
@@ -74,14 +95,44 @@ export function demoPlugin(
           }
         }
 
+        // Serve static assets from srcDir at root path
+        // (mirrors build mode's copyTargets behavior)
+        const ext = path.extname(cleanUrl).slice(1);
+        if (ext && option.copyTargets.includes(ext)) {
+          const srcAssetPath = path.join(srcDir, cleanUrl);
+          if (
+            fs.existsSync(srcAssetPath) &&
+            fs.statSync(srcAssetPath).isFile()
+          ) {
+            const mimeTypes: Record<string, string> = {
+              ".png": "image/png",
+              ".jpg": "image/jpeg",
+              ".jpeg": "image/jpeg",
+              ".gif": "image/gif",
+              ".svg": "image/svg+xml",
+              ".webp": "image/webp",
+              ".ico": "image/x-icon",
+            };
+            res.setHeader(
+              "Content-Type",
+              mimeTypes[`.${ext}`] ?? "application/octet-stream",
+            );
+            fs.createReadStream(srcAssetPath).pipe(res);
+            return;
+          }
+        }
+
         // Serve static assets from template dir
         const templateDir = path.resolve(
           path.dirname(new URL(import.meta.url).pathname),
           "../template/",
         );
-        const assetPath = path.join(templateDir, cleanUrl);
-        if (fs.existsSync(assetPath) && fs.statSync(assetPath).isFile()) {
-          const ext = path.extname(assetPath);
+        const templateAssetPath = path.join(templateDir, cleanUrl);
+        if (
+          fs.existsSync(templateAssetPath) &&
+          fs.statSync(templateAssetPath).isFile()
+        ) {
+          const templateExt = path.extname(templateAssetPath);
           const mimeTypes: Record<string, string> = {
             ".css": "text/css",
             ".js": "application/javascript",
@@ -90,9 +141,9 @@ export function demoPlugin(
           };
           res.setHeader(
             "Content-Type",
-            mimeTypes[ext] ?? "application/octet-stream",
+            mimeTypes[templateExt] ?? "application/octet-stream",
           );
-          fs.createReadStream(assetPath).pipe(res);
+          fs.createReadStream(templateAssetPath).pipe(res);
           return;
         }
 
@@ -100,6 +151,45 @@ export function demoPlugin(
       });
     },
   };
+}
+
+/**
+ * Scan demo entry files for relative import paths and collect
+ * the unique parent directories that should be watched.
+ */
+function collectImportedDirs(
+  srcDir: string,
+  entries: string[],
+): Set<string> {
+  const dirs = new Set<string>();
+  const importPattern = /from\s+['"]([^'"]+)['"]/g;
+
+  for (const entry of entries) {
+    const filePath = path.join(srcDir, entry);
+    let content: string;
+    try {
+      content = fs.readFileSync(filePath, "utf-8");
+    } catch {
+      continue;
+    }
+
+    let match: RegExpExecArray | null;
+    while ((match = importPattern.exec(content)) !== null) {
+      const importPath = match[1];
+      if (!importPath.startsWith(".")) continue;
+
+      const resolved = path.resolve(srcDir, importPath);
+      const dir = fs.existsSync(resolved) && fs.statSync(resolved).isDirectory()
+        ? resolved
+        : path.dirname(resolved);
+
+      if (dir !== srcDir && !dir.includes("node_modules")) {
+        dirs.add(dir);
+      }
+    }
+  }
+
+  return dirs;
 }
 
 function isDemoFile(filePath: string, srcDir: string, prefix: string): boolean {
