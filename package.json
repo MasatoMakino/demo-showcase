@@ -2,6 +2,12 @@
   "name": "@masatomakino/demo-showcase",
   "version": "0.1.0",
   "description": "Generate demo HTML pages from JS/TS source files using Vite",
+  "keywords": [
+    "demo",
+    "html-generator",
+    "typescript",
+    "static-site"
+  ],
   "type": "module",
   "main": "bin/CLI.js",
   "bin": {
@@ -9,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://MasatoMakino@github.com/MasatoMakino/demo-showcase.git"
+    "url": "git+https://github.com/MasatoMakino/demo-showcase.git"
   },
   "files": [
     "bin",
@@ -44,6 +50,9 @@
     "url": "https://github.com/MasatoMakino/demo-showcase/issues"
   },
   "homepage": "https://github.com/MasatoMakino/demo-showcase#readme",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "directories": {
     "doc": "docs"
   }
