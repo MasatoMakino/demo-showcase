@@ -2,6 +2,7 @@ import fs from "node:fs";
 import fsPromises from "node:fs/promises";
 import path from "node:path";
 import type { Plugin, ViteDevServer } from "vite";
+import { lookupMimeType } from "./MimeType.js";
 import type { InitializedOption } from "./Option.js";
 
 /**
@@ -104,19 +105,7 @@ export function demoPlugin(
             fs.existsSync(srcAssetPath) &&
             fs.statSync(srcAssetPath).isFile()
           ) {
-            const mimeTypes: Record<string, string> = {
-              ".png": "image/png",
-              ".jpg": "image/jpeg",
-              ".jpeg": "image/jpeg",
-              ".gif": "image/gif",
-              ".svg": "image/svg+xml",
-              ".webp": "image/webp",
-              ".ico": "image/x-icon",
-            };
-            res.setHeader(
-              "Content-Type",
-              mimeTypes[`.${ext}`] ?? "application/octet-stream",
-            );
+            res.setHeader("Content-Type", lookupMimeType(ext));
             fs.createReadStream(srcAssetPath).pipe(res);
             return;
           }
@@ -133,16 +122,7 @@ export function demoPlugin(
           fs.statSync(templateAssetPath).isFile()
         ) {
           const templateExt = path.extname(templateAssetPath);
-          const mimeTypes: Record<string, string> = {
-            ".css": "text/css",
-            ".js": "application/javascript",
-            ".png": "image/png",
-            ".ico": "image/x-icon",
-          };
-          res.setHeader(
-            "Content-Type",
-            mimeTypes[templateExt] ?? "application/octet-stream",
-          );
+          res.setHeader("Content-Type", lookupMimeType(templateExt));
           fs.createReadStream(templateAssetPath).pipe(res);
           return;
         }
