@@ -41,6 +41,12 @@ devcontainer stop --workspace-folder .
 - `devcontainer exec --workspace-folder . npm run test:watch` - Run tests in watch mode
 - `devcontainer exec --workspace-folder . npm run coverage` - Generate test coverage report
 
+### Dev Server
+
+- `devcontainer exec --workspace-folder . npm run dev` - Start dev server (port 3456, host 0.0.0.0)
+- Use `docker port demo-showcase-npm-runner 3456` to find the host port
+- See `dev-server-lifecycle` skill for stop procedure
+
 ### CLI Testing
 
 - `devcontainer exec --workspace-folder . npm run testRun` - Test the built CLI tool with default options
