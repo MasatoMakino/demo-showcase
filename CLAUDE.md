@@ -131,7 +131,7 @@ Templates use plain HTML with `{{PLACEHOLDER}}` markers replaced by `HtmlGenerat
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `--port <number>` | `3000` | Dev server port |
+| `--port <number>` | `3456` | Dev server port |
 | `--open` | `false` | Open browser on start |
 | `--host <string>` | `"localhost"` | Dev server host |
 

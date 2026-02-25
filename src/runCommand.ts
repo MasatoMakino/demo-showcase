@@ -43,7 +43,7 @@ export async function runCommand() {
     .description("Start dev server with HMR");
   addSharedOptions(devCmd);
   devCmd
-    .option("--port <number>", "Dev server port", "3000")
+    .option("--port <number>", "Dev server port", "3456")
     .option("--open", "Open browser on start")
     .option("--host <string>", "Dev server host", "localhost");
   devCmd.action(async (args) => {

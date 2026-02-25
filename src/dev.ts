@@ -20,9 +20,10 @@ export async function devDemo(option: InitializedOption): Promise<void> {
   }
 
   const root = path.resolve(process.cwd());
-  const port = option.port ?? 3000;
+  const port = option.port ?? 3456;
+  const host = option.host ?? "localhost";
 
-  let config = createDevConfig(root, port);
+  let config = createDevConfig(root, port, host);
 
   // Add custom demo plugin + full reload on JS/TS changes
   const srcGlob = `${option.srcDir}/**/*.{js,ts}`;
@@ -35,7 +36,6 @@ export async function devDemo(option: InitializedOption): Promise<void> {
   const server = await createServer(config);
   await server.listen();
 
-  const host = option.host ?? "localhost";
   const openUrl = `http://${host}:${server.config.server.port}`;
   console.log(`demo-showcase: Dev server running at ${openUrl}`);
 

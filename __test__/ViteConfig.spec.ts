@@ -25,16 +25,22 @@ describe("ViteConfig", () => {
 
   describe("createDevConfig", () => {
     it("should create dev config with absolute base", () => {
-      const config = createDevConfig("/project", 3000);
+      const config = createDevConfig("/project", 3000, "localhost");
 
       expect(config.base).toBe("/");
       expect(config.root).toBe("/project");
       expect(config.server?.port).toBe(3000);
+      expect(config.server?.host).toBe("localhost");
     });
 
     it("should use specified port", () => {
-      const config = createDevConfig("/project", 8080);
+      const config = createDevConfig("/project", 8080, "localhost");
       expect(config.server?.port).toBe(8080);
+    });
+
+    it("should use specified host", () => {
+      const config = createDevConfig("/project", 3000, "0.0.0.0");
+      expect(config.server?.host).toBe("0.0.0.0");
     });
   });
 });
