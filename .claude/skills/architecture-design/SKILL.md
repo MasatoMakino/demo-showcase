@@ -79,6 +79,8 @@ The index page is a sidebar + iframe layout (Pure.css), not a single-page applic
 
 Users can provide a custom `vite.config.ts` via `--config`. It is merged with the base config using Vite's `mergeConfig()`, not replaced. This allows users to add plugins or adjust settings without losing demo-showcase's required configuration.
 
+**Usage survey (2026-02)**: The predecessor's `--rule` option (webpack custom loader) was used in only 1 of 38+ dependent projects (`threejs-lab`, for `webpack-glsl-loader` to import `.vert`/`.frag` as strings). Vite's built-in `?raw` suffix (`import shader from "./shader.frag?raw"`) replaces this use case without any plugin or config. The `--config` option is retained as insurance for unforeseen needs, but no known use case currently requires it.
+
 ### 9. Dev Server Host: Secure Default
 
 The `--host` CLI default is `localhost`, not `0.0.0.0`.
