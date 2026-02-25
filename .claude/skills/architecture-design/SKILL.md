@@ -79,7 +79,16 @@ The index page is a sidebar + iframe layout (Pure.css), not a single-page applic
 
 Users can provide a custom `vite.config.ts` via `--config`. It is merged with the base config using Vite's `mergeConfig()`, not replaced. This allows users to add plugins or adjust settings without losing demo-showcase's required configuration.
 
-### 9. Static Asset Strategy
+### 9. Dev Server Host: Secure Default
+
+The `--host` CLI default is `localhost`, not `0.0.0.0`.
+
+- **`localhost`** binds to loopback only — no LAN exposure. Safe for users running without container isolation.
+- **`0.0.0.0`** binds to all interfaces — required for Docker port forwarding, but exposes the server to the local network.
+
+Users who need container-external access (e.g., DevContainer with `-p 0:3456`) explicitly pass `--host 0.0.0.0`. This project's `npm run dev` includes it because development uses DevContainer isolation.
+
+### 10. Static Asset Strategy
 
 - Images in srcDir are copied to distDir (not processed by Vite)
 - Default copy targets (png, jpg, jpeg) are always included; user additions are merged, not replaced
