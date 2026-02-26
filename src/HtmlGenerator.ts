@@ -3,6 +3,7 @@ import fsPromises from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { InitializedOption } from "./Option.js";
+import { escapeHtmlAttr, replaceExtension } from "./htmlUtils.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -43,12 +44,11 @@ export async function generateDemoHtml(
 }
 
 /**
- * Generate the navigation index.html page.
+ * Build index HTML string from template without file I/O.
  */
-export async function generateIndexHtml(
+export async function buildIndexHtmlString(
   demoPaths: string[],
-  distDir: string,
-): Promise<void> {
+): Promise<string> {
   const templatePath = path.resolve(__dirname, "../template/index.html");
   const template = await fsPromises.readFile(templatePath, "utf8");
 
@@ -63,11 +63,21 @@ export async function generateIndexHtml(
     )
     .join("\n                ");
 
-  const html = template
+  return template
     .replaceAll("{{PACKAGE_NAME}}", packageName)
     .replaceAll("{{REPOSITORY}}", repository)
     .replace("{{DEMO_PATHS}}", escapeHtmlAttr(JSON.stringify(demoPaths)))
     .replace("{{DEMO_MENU_ITEMS}}", menuItems);
+}
+
+/**
+ * Generate the navigation index.html page.
+ */
+export async function generateIndexHtml(
+  demoPaths: string[],
+  distDir: string,
+): Promise<void> {
+  const html = await buildIndexHtmlString(demoPaths);
 
   await fsPromises.mkdir(distDir, { recursive: true });
   await fsPromises.writeFile(path.join(distDir, "index.html"), html, "utf8");
@@ -79,15 +89,6 @@ async function copyIndexScript(distDir: string) {
   const scriptSrcPath = path.resolve(__dirname, "../template/indexScript.js");
   const scriptDestPath = path.resolve(distDir, "indexScript.js");
   await fsPromises.copyFile(scriptSrcPath, scriptDestPath);
-}
-
-function escapeHtmlAttr(str: string): string {
-  return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
-}
-
-function replaceExtension(filePath: string, newExt: string): string {
-  const ext = path.extname(filePath);
-  return filePath.slice(0, -ext.length) + newExt;
 }
 
 function readPackageJson(): PackageJsonRepository {
@@ -105,9 +106,8 @@ function getHomePageURL(packageJson: PackageJsonRepository): string {
 
   if (repositoryPath == null) return "";
 
-  const gitRegExp = /^git\+(.*)\.git$/;
-  if (gitRegExp.test(repositoryPath)) {
-    const match = repositoryPath.match(/^git\+(.*)/) as RegExpMatchArray;
+  const match = repositoryPath.match(/^git\+(.*)\.git$/);
+  if (match) {
     return match[1];
   }
   return repositoryPath;

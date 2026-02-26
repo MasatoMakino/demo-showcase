@@ -1,7 +1,8 @@
 import fs from "node:fs";
-import fsPromises from "node:fs/promises";
 import path from "node:path";
 import type { Plugin, ViteDevServer } from "vite";
+import { buildIndexHtmlString } from "./HtmlGenerator.js";
+import { replaceExtension } from "./htmlUtils.js";
 import { lookupMimeType } from "./MimeType.js";
 import type { InitializedOption } from "./Option.js";
 
@@ -164,50 +165,9 @@ function isDemoFile(filePath: string, srcDir: string, prefix: string): boolean {
   return basename.startsWith(prefix);
 }
 
-/**
- * Build index HTML string for dev mode.
- */
 async function buildIndexHtml(entries: string[]): Promise<string> {
-  const templatePath = path.resolve(
-    path.dirname(new URL(import.meta.url).pathname),
-    "../template/index.html",
-  );
-  const template = await fsPromises.readFile(templatePath, "utf8");
-
   const demoPaths = entries.map((entry) => replaceExtension(entry, ".html"));
-
-  let packageName = "";
-  let repository = "";
-  try {
-    const jsonPath = path.resolve(process.cwd(), "package.json");
-    const pkg = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
-    packageName = pkg.name ?? "";
-    const repoUrl =
-      typeof pkg.repository === "object" ? pkg.repository.url : pkg.repository;
-    if (repoUrl) {
-      const match = repoUrl.match(/^git\+(.*)/);
-      repository = match ? match[1] : repoUrl;
-    }
-  } catch {
-    // package.json not found or invalid
-  }
-
-  const menuItems = demoPaths
-    .map(
-      (p) =>
-        `<li class="pure-menu-item"><a class="pure-menu-link" href="${p}" target="demo-frame">${p}</a></li>`,
-    )
-    .join("\n                ");
-
-  return template
-    .replaceAll("{{PACKAGE_NAME}}", packageName)
-    .replaceAll("{{REPOSITORY}}", repository)
-    .replace("{{DEMO_PATHS}}", escapeHtmlAttr(JSON.stringify(demoPaths)))
-    .replace("{{DEMO_MENU_ITEMS}}", menuItems);
-}
-
-function escapeHtmlAttr(str: string): string {
-  return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+  return buildIndexHtmlString(demoPaths);
 }
 
 /**
@@ -244,9 +204,4 @@ function findDemoEntry(
     }
   }
   return undefined;
-}
-
-function replaceExtension(filePath: string, newExt: string): string {
-  const ext = path.extname(filePath);
-  return filePath.slice(0, -ext.length) + newExt;
 }

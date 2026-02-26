@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { build as viteBuild } from "vite";
 import { discoverDemoEntries } from "./entries.js";
 import { generateIndexHtml } from "./HtmlGenerator.js";
+import { replaceExtension } from "./htmlUtils.js";
 import type { InitializedOption } from "./Option.js";
 import { getStyleTask } from "./Style.js";
 import { createBuildConfig } from "./ViteConfig.js";
@@ -129,9 +130,4 @@ async function copyIndexScriptToDist(option: InitializedOption): Promise<void> {
     "indexScript.js",
   );
   await fsPromises.copyFile(srcPath, destPath);
-}
-
-function replaceExtension(filePath: string, newExt: string): string {
-  const ext = path.extname(filePath);
-  return filePath.slice(0, -ext.length) + newExt;
 }
