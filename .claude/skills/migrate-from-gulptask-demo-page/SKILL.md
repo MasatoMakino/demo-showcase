@@ -28,7 +28,7 @@ npm uninstall @masatomakino/gulptask-demo-page browser-sync
 
 Notes:
 - `--compileModule` is unnecessary (Vite handles natively)
-- `--host 0.0.0.0` is required for DevContainer port forwarding
+- `--host 0.0.0.0` is required when running the dev server inside a container (e.g., DevContainer, Docker) for port forwarding to the host
 - If the project runs tsc and demo-showcase in parallel (e.g., `start:dev`), remove the `watch:demo` part and replace the server command
 
 ### 3. Update CI workflow (if applicable)
@@ -108,7 +108,7 @@ export { MyClass } from "./module.js";
 export type { MyInterface } from "./module.js";
 ```
 
-This does not affect production builds (`demo-showcase build`) because Vite uses Rollup with full bundle analysis. It only affects the dev server.
+This is a general Vite behavior, not specific to demo-showcase. Production builds are unaffected because Vite uses Rollup with full bundle analysis. It only affects the dev server (esbuild per-file transpilation).
 
 **Prevention:** Enable `verbatimModuleSyntax: true` in `tsconfig.json`. This makes tsc emit `TS1205` errors for type-only re-exports missing the `type` keyword, catching the issue before migration. Note that Biome's `useExportType` rule cannot detect this because it operates on a single-file basis without cross-file type resolution.
 
@@ -120,11 +120,11 @@ This does not affect production builds (`demo-showcase build`) because Vite uses
 
 **Fix:** Restart the dev server. A browser reload alone is insufficient because Vite serves from its in-memory cache, not from disk.
 
-### File casing mismatch (macOS + Linux container)
+### File casing mismatch (case-insensitive → case-sensitive filesystem)
 
-**Symptom:** Vite dev server in a Linux container serves stale module content despite file changes.
+**Symptom:** Vite dev server on a case-sensitive filesystem (Linux, CI environments, containers) serves stale module content despite file changes.
 
-**Cause:** macOS filesystem is case-insensitive. If source files were renamed with casing changes (e.g., `Foo.ts` → `foo.ts`), compiled output may retain the old casing. Vite in a Linux container treats these as different modules.
+**Cause:** On case-insensitive filesystems (macOS, Windows), renaming files with casing changes (e.g., `Foo.ts` → `foo.ts`) may leave compiled output with the old casing. Vite on a case-sensitive filesystem treats these as different modules, leading to stale imports.
 
 **Fix:** Delete the compiled output directory entirely and rebuild.
 
