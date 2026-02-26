@@ -42,7 +42,7 @@ Rationale: The replacement targets are fixed and few (TITLE, STYLE, SCRIPT, BODY
 | dev | Live preview | Dynamic generation via Vite plugin middleware |
 | build | Static output | Staging directory → Vite build → cleanup |
 
-Both modes share the same entry discovery and HTML generation logic but differ in execution strategy. Dev mode avoids filesystem writes by serving HTML from memory; build mode uses a staging directory because Vite's build API requires physical files.
+Both modes share the same entry discovery and HTML generation logic (`buildIndexHtmlString()` in `HtmlGenerator.ts`) but differ in execution strategy. Dev mode avoids filesystem writes by serving HTML from memory; build mode uses a staging directory because Vite's build API requires physical files.
 
 ### 5. Dev Mode: Reload Strategy
 

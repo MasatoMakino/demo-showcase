@@ -79,7 +79,8 @@ npx @masatomakino/demo-showcase build [options]   # Static site output
 - **Dev Mode**: `src/dev.ts` - Vite dev server with custom plugin
 - **Vite Config**: `src/ViteConfig.ts` - Vite config builder
 - **Demo Plugin**: `src/DemoPlugin.ts` - Custom Vite plugin (dev server middleware)
-- **HTML Generator**: `src/HtmlGenerator.ts` - HTML generation from templates (string replacement)
+- **HTML Generator**: `src/HtmlGenerator.ts` - HTML generation from templates; exports `buildIndexHtmlString()` (in-memory) and `generateIndexHtml()` (file write)
+- **HTML Utilities**: `src/htmlUtils.ts` - Shared utilities: `escapeHtmlAttr()`, `replaceExtension()`
 - **Entry Discovery**: `src/entries.ts` - Demo source file discovery
 - **File Operations**: `src/Clean.ts`, `src/Style.ts` - Asset management
 - **Options**: `src/Option.ts` - Option types and defaults

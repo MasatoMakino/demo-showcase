@@ -14,10 +14,10 @@ data-demo-paths="[&quot;a.html&quot;,&quot;b.html&quot;]"
 
 ## Implementation
 
+Shared utility in `src/htmlUtils.ts`:
+
 ```typescript
-function escapeHtmlAttr(str: string): string {
-  return str.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
-}
+import { escapeHtmlAttr } from "./htmlUtils.js";
 
 template.replace("{{PLACEHOLDER}}", escapeHtmlAttr(JSON.stringify(data)));
 ```
