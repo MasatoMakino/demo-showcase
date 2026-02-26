@@ -96,21 +96,6 @@ export function demoPlugin(
           }
         }
 
-        // Serve static assets from srcDir at root path
-        // (mirrors build mode's copyTargets behavior)
-        const ext = path.extname(cleanUrl).slice(1);
-        if (ext && option.copyTargets.includes(ext)) {
-          const srcAssetPath = path.join(srcDir, cleanUrl);
-          if (
-            fs.existsSync(srcAssetPath) &&
-            fs.statSync(srcAssetPath).isFile()
-          ) {
-            res.setHeader("Content-Type", lookupMimeType(ext));
-            fs.createReadStream(srcAssetPath).pipe(res);
-            return;
-          }
-        }
-
         // Serve static assets from template dir
         const templateDir = path.resolve(
           path.dirname(new URL(import.meta.url).pathname),

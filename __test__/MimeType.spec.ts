@@ -22,7 +22,7 @@ describe("lookupMimeType", () => {
     expect(lookupMimeType(".css")).toBe("text/css");
   });
 
-  it("should return correct MIME types for custom copyTargets extensions", () => {
+  it("should return correct MIME types for media extensions", () => {
     expect(lookupMimeType("webm")).toBe("video/webm");
     expect(lookupMimeType("mp4")).toBe("video/mp4");
     expect(lookupMimeType("glb")).toBe("model/gltf-binary");

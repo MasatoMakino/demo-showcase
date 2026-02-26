@@ -1,5 +1,5 @@
 import path from "node:path";
-import { type InlineConfig, mergeConfig } from "vite";
+import type { InlineConfig } from "vite";
 import type { InitializedOption } from "./Option.js";
 
 /**
@@ -45,15 +45,3 @@ export function createDevConfig(
   };
 }
 
-/**
- * Merge user's vite.config with base config.
- */
-export async function mergeUserConfig(
-  baseConfig: InlineConfig,
-  configPath: string,
-): Promise<InlineConfig> {
-  const absolutePath = path.resolve(process.cwd(), configPath);
-  const userModule = await import(absolutePath);
-  const userConfig = userModule.default ?? userModule;
-  return mergeConfig(baseConfig, userConfig);
-}

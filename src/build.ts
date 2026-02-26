@@ -3,12 +3,11 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { build as viteBuild } from "vite";
-import { copyAssets } from "./Copy.js";
 import { discoverDemoEntries } from "./entries.js";
 import { generateIndexHtml } from "./HtmlGenerator.js";
 import type { InitializedOption } from "./Option.js";
 import { getStyleTask } from "./Style.js";
-import { createBuildConfig, mergeUserConfig } from "./ViteConfig.js";
+import { createBuildConfig } from "./ViteConfig.js";
 
 /**
  * Build static demo site.
@@ -17,8 +16,7 @@ import { createBuildConfig, mergeUserConfig } from "./ViteConfig.js";
  * 2. Create staging directory with generated HTML entry points
  * 3. Run Vite build with MPA rollup inputs
  * 4. Copy template assets (styles, favicon, etc.)
- * 5. Copy static assets from srcDir (images, etc.)
- * 6. Clean up staging directory
+ * 5. Clean up staging directory
  */
 export async function buildDemo(option: InitializedOption): Promise<void> {
   const entries = discoverDemoEntries(option);
@@ -55,17 +53,11 @@ export async function buildDemo(option: InitializedOption): Promise<void> {
     await copyTemplateAssets(stagingDir);
 
     // Build with Vite
-    let config = createBuildConfig(option, inputs, stagingDir);
-    if (option.config) {
-      config = await mergeUserConfig(config, option.config);
-    }
+    const config = createBuildConfig(option, inputs, stagingDir);
     await viteBuild(config);
 
     // Copy indexScript.js to distDir (not bundled by Vite since it lacks type="module")
     await copyIndexScriptToDist(option);
-
-    // Copy static assets from srcDir to distDir
-    await copyAssets(option);
   } finally {
     // Clean up staging directory
     await fsPromises.rm(stagingDir, { recursive: true, force: true });

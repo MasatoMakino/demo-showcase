@@ -16,7 +16,7 @@ Library developers need demo pages to verify and showcase behavior. This tool el
 ### 1. Convention Over Configuration
 
 - Demo files are discovered by filename prefix convention (`demo_*.{js,ts}`)
-- Sensible defaults for all options (srcDir, distDir, prefix, copyTargets)
+- Sensible defaults for all options (srcDir, distDir, prefix)
 - Zero-config TypeScript support (delegated to Vite/esbuild)
 - Works out-of-the-box with no configuration files required
 
@@ -75,11 +75,9 @@ The index page is a sidebar + iframe layout (Pure.css), not a single-page applic
 - URL query parameter (`?demo=name`) enables deep linking to specific demos
 - `indexScript.js` is deliberately not bundled by Vite (no `type="module"`) to keep it simple and self-contained
 
-### 8. User Config Merging
+### 8. No External Config Injection
 
-Users can provide a custom `vite.config.ts` via `--config`. It is merged with the base config using Vite's `mergeConfig()`, not replaced. This allows users to add plugins or adjust settings without losing demo-showcase's required configuration.
-
-**Usage survey (2026-02)**: The predecessor's `--rule` option (webpack custom loader) was used in only 1 of 38+ dependent projects (`threejs-lab`, for `webpack-glsl-loader` to import `.vert`/`.frag` as strings). Vite's built-in `?raw` suffix (`import shader from "./shader.frag?raw"`) replaces this use case without any plugin or config. The `--config` option is retained as insurance for unforeseen needs, but no known use case currently requires it.
+The predecessor's `--rule` option (webpack custom loader) was used in only 1 of 38+ dependent projects (`threejs-lab`, for `webpack-glsl-loader` to import `.vert`/`.frag` as strings). Vite's built-in `?raw` suffix (`import shader from "./shader.frag?raw"`) replaces this use case without any plugin or config. No known use case requires external Vite config injection, so the feature was removed to keep the interface simple.
 
 ### 9. Dev Server Host: Secure Default
 
@@ -92,6 +90,7 @@ Users who need container-external access (e.g., DevContainer with `-p 0:3456`) e
 
 ### 10. Static Asset Strategy
 
-- Images in srcDir are copied to distDir (not processed by Vite)
-- Default copy targets (png, jpg, jpeg) are always included; user additions are merged, not replaced
+- Assets (images, etc.) in demo source files are handled via Vite's native import mechanism
+- `import imgUrl from "./images/red.png"` resolves correctly in both dev and build modes
+- Vite optimizes assets automatically: content hashing for cache busting, small-file inlining as data URI
 - `base: './'` enables deployment to any subdirectory (e.g., GitHub Pages `docs/demo/`)

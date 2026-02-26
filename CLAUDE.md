@@ -77,21 +77,20 @@ npx @masatomakino/demo-showcase build [options]   # Static site output
 - **Command Runner**: `src/runCommand.ts` - Commander.js argument parsing (dev/build subcommands)
 - **Build Mode**: `src/build.ts` - Static site build orchestration via Vite
 - **Dev Mode**: `src/dev.ts` - Vite dev server with custom plugin
-- **Vite Config**: `src/ViteConfig.ts` - Vite config builder + user config merging
+- **Vite Config**: `src/ViteConfig.ts` - Vite config builder
 - **Demo Plugin**: `src/DemoPlugin.ts` - Custom Vite plugin (dev server middleware)
 - **HTML Generator**: `src/HtmlGenerator.ts` - HTML generation from templates (string replacement)
 - **Entry Discovery**: `src/entries.ts` - Demo source file discovery
-- **File Operations**: `src/Copy.ts`, `src/Clean.ts`, `src/Style.ts` - Asset management
+- **File Operations**: `src/Clean.ts`, `src/Style.ts` - Asset management
 - **Options**: `src/Option.ts` - Option types and defaults
 
 ### Build Flow
 
 1. Discover demo source files matching prefix pattern
 2. Create staging directory with generated HTML entry points
-3. Run `vite.build()` with MPA rollup inputs
+3. Run `vite.build()` with MPA rollup inputs (assets referenced via `import` are bundled by Vite)
 4. Copy `indexScript.js` to dist (not bundled by Vite)
-5. Copy static assets (images, etc.) from srcDir to distDir
-6. Clean up staging directory
+5. Clean up staging directory
 
 ### Dev Flow
 
@@ -130,8 +129,6 @@ Templates use plain HTML with `{{PLACEHOLDER}}` markers replaced by `HtmlGenerat
 | `--distDir <path>` | `"./docs/demo"` | Output directory (build mode) |
 | `--body <string>` | `""` | HTML body content |
 | `--style <string>` | `""` | Custom CSS styles |
-| `--copyTargets [ext...]` | `["png","jpg","jpeg"]` | File extensions to copy |
-| `--config <path>` | none | Path to custom `vite.config.ts` for merging |
 
 ### Dev-only Options
 

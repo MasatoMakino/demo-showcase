@@ -20,12 +20,7 @@ export async function runCommand() {
       .option("--srcDir <path>", "Demo source directory", "./demoSrc")
       .option("--distDir <path>", "Output directory", "./docs/demo")
       .option("--body <string>", "HTML body content")
-      .option("--style <string>", "Custom CSS styles")
-      .option(
-        "--copyTargets [extensions...]",
-        'File extensions to copy (e.g., "png", "jpg")',
-      )
-      .option("--config <path>", "Path to custom vite.config.ts for merging");
+      .option("--style <string>", "Custom CSS styles");
   }
 
   // Build subcommand

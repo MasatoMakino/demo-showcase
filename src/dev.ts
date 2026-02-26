@@ -4,7 +4,7 @@ import FullReload from "vite-plugin-full-reload";
 import { demoPlugin } from "./DemoPlugin.js";
 import { discoverDemoEntries } from "./entries.js";
 import type { InitializedOption } from "./Option.js";
-import { createDevConfig, mergeUserConfig } from "./ViteConfig.js";
+import { createDevConfig } from "./ViteConfig.js";
 
 /**
  * Start Vite dev server with demo page middleware.
@@ -23,15 +23,11 @@ export async function devDemo(option: InitializedOption): Promise<void> {
   const port = option.port ?? 3456;
   const host = option.host ?? "localhost";
 
-  let config = createDevConfig(root, port, host);
+  const config = createDevConfig(root, port, host);
 
   // Add custom demo plugin + full reload on JS/TS changes
   const srcGlob = `${option.srcDir}/**/*.{js,ts}`;
   config.plugins = [demoPlugin(option, entries), FullReload([srcGlob])];
-
-  if (option.config) {
-    config = await mergeUserConfig(config, option.config);
-  }
 
   const server = await createServer(config);
   await server.listen();

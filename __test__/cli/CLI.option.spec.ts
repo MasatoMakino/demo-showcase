@@ -19,7 +19,6 @@ describe("CLI options", () => {
       distDir: "./testDist",
       body: "<div>test</div>",
       style: "body { color: red; }",
-      copyTargets: ["gif"],
     });
 
     expect(buildDemo).toHaveBeenCalledWith(

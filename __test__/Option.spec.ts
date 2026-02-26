@@ -9,7 +9,6 @@ describe("initOptions", () => {
     expect(option.distDir).toBe("./docs/demo");
     expect(option.body).toBe("");
     expect(option.style).toBe("");
-    expect(option.copyTargets).toEqual(["png", "jpg", "jpeg"]);
   });
 
   it("should merge custom options with defaults", () => {
@@ -19,16 +18,11 @@ describe("initOptions", () => {
       distDir: "./dist",
       body: "<div></div>",
       style: "body { color: red; }",
-      copyTargets: ["gif", "png"],
     });
     expect(option.prefix).toBe("test");
     expect(option.srcDir).toBe("./src");
     expect(option.distDir).toBe("./dist");
     expect(option.body).toBe("<div></div>");
     expect(option.style).toBe("body { color: red; }");
-    expect(option.copyTargets).toContain("png");
-    expect(option.copyTargets).toContain("jpg");
-    expect(option.copyTargets).toContain("jpeg");
-    expect(option.copyTargets).toContain("gif");
   });
 });

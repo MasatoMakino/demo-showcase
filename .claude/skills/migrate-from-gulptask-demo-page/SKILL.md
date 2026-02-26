@@ -54,6 +54,41 @@ npm run build
 
 **No changes required.** Existing `demoSrc/demo_*.js` (or `.ts`) files work as-is in both build and dev modes.
 
+### 6. Asset references (images, etc.)
+
+demo-showcase uses Vite's native asset import mechanism. If demo scripts reference images or other assets via string literals, migrate to Vite import syntax:
+
+```typescript
+// Before: string literal (not processed by Vite)
+const img = new Image();
+img.src = "./images/photo.png";
+
+// After: Vite import (bundled with content hash, small files inlined)
+import photoUrl from "./images/photo.png";
+const img = new Image();
+img.src = photoUrl;
+```
+
+**TypeScript type errors**: TypeScript does not recognize asset imports by default. Add `vite/client` types to suppress errors:
+
+Method 1 — tsconfig.json:
+```json
+{
+  "compilerOptions": {
+    "types": ["vite/client"]
+  }
+}
+```
+
+Method 2 — Create `vite-env.d.ts` in the project root:
+```typescript
+/// <reference types="vite/client" />
+```
+
+`vite/client` provides type shims for asset imports (`.png`, `.svg`, etc.), `import.meta.env`, and `import.meta.hot`.
+
+Reference: [Vite - Static Asset Handling](https://ja.vite.dev/guide/assets#importing-asset-as-url), [Vite - Client Types](https://ja.vite.dev/guide/features#client-types)
+
 ## Known Issues
 
 ### File casing mismatch (macOS + Linux container)
