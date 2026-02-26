@@ -35,7 +35,8 @@ export function demoPlugin(
       // Trigger full reload when watched import targets change.
       // Skip declaration files to avoid spurious reloads from tsc output.
       server.watcher.on("change", (filePath) => {
-        if (filePath.endsWith(".d.ts") || filePath.endsWith(".d.ts.map")) return;
+        if (filePath.endsWith(".d.ts") || filePath.endsWith(".d.ts.map"))
+          return;
         for (const dir of importedDirs) {
           if (filePath.startsWith(dir)) {
             server.ws.send({ type: "full-reload", path: "*" });
@@ -123,10 +124,7 @@ export function demoPlugin(
  * Scan demo entry files for relative import paths and collect
  * the unique parent directories that should be watched.
  */
-function collectImportedDirs(
-  srcDir: string,
-  entries: string[],
-): Set<string> {
+function collectImportedDirs(srcDir: string, entries: string[]): Set<string> {
   const dirs = new Set<string>();
   const importPattern = /from\s+['"]([^'"]+)['"]/g;
 
@@ -139,15 +137,19 @@ function collectImportedDirs(
       continue;
     }
 
-    let match: RegExpExecArray | null;
-    while ((match = importPattern.exec(content)) !== null) {
+    for (
+      let match = importPattern.exec(content);
+      match !== null;
+      match = importPattern.exec(content)
+    ) {
       const importPath = match[1];
       if (!importPath.startsWith(".")) continue;
 
       const resolved = path.resolve(srcDir, importPath);
-      const dir = fs.existsSync(resolved) && fs.statSync(resolved).isDirectory()
-        ? resolved
-        : path.dirname(resolved);
+      const dir =
+        fs.existsSync(resolved) && fs.statSync(resolved).isDirectory()
+          ? resolved
+          : path.dirname(resolved);
 
       if (dir !== srcDir && !dir.includes("node_modules")) {
         dirs.add(dir);
