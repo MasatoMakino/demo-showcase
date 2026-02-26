@@ -47,6 +47,9 @@ cleanTest/
 # IDE
 .idea
 
+# Qlty
+.qlty/
+
 # Claude Code
 .claude/settings.local.json
 .local-notes/
