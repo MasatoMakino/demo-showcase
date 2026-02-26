@@ -91,6 +91,35 @@ Reference: [Vite - Static Asset Handling](https://ja.vite.dev/guide/assets#impor
 
 ## Known Issues
 
+### Barrel file type-only re-exports
+
+**Symptom:** Vite dev server throws `does not provide an export named 'FooParam'` for TypeScript interfaces or type aliases.
+
+**Cause:** Vite's dev mode uses esbuild for per-file transpilation. In barrel files (`index.ts`), `export { SomeInterface } from "./module.js"` compiles to a value re-export, but the interface is erased by esbuild, leaving a dangling reference.
+
+**Fix:** Use `export type` for type-only re-exports in barrel files:
+
+```typescript
+// Before (fails in Vite dev mode)
+export { MyClass, MyInterface } from "./module.js";
+
+// After
+export { MyClass } from "./module.js";
+export type { MyInterface } from "./module.js";
+```
+
+This does not affect production builds (`demo-showcase build`) because Vite uses Rollup with full bundle analysis. It only affects the dev server.
+
+**Prevention:** Enable `verbatimModuleSyntax: true` in `tsconfig.json`. This makes tsc emit `TS1205` errors for type-only re-exports missing the `type` keyword, catching the issue before migration. Note that Biome's `useExportType` rule cannot detect this because it operates on a single-file basis without cross-file type resolution.
+
+### Stale module cache after source fixes
+
+**Symptom:** After fixing source errors (e.g., the barrel file issue above), the dev server still serves old module content. Manual browser reload does not help.
+
+**Cause:** Vite caches transformed modules in memory. If the dev server was running when the source error occurred, the error-state modules remain cached. File watcher events for subsequent fixes may not invalidate these stale entries.
+
+**Fix:** Restart the dev server. A browser reload alone is insufficient because Vite serves from its in-memory cache, not from disk.
+
 ### File casing mismatch (macOS + Linux container)
 
 **Symptom:** Vite dev server in a Linux container serves stale module content despite file changes.
