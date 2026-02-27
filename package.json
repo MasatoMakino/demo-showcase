@@ -43,6 +43,7 @@
     "build": "tsc",
     "watch": "tsc -W",
     "testRun": "node ./bin/CLI.js build --srcDir ./demoSrc",
+    "lint": "biome ci .",
     "dev": "node ./bin/CLI.js dev --srcDir ./demoSrc --host 0.0.0.0",
     "pre-commit": "biome format --write --no-errors-on-unmatched --files-ignore-unknown=true",
     "pre-push": "biome ci . && vitest --run"
