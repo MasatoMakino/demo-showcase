@@ -1,6 +1,6 @@
 {
   "name": "@masatomakino/demo-showcase",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Generate demo HTML pages from JS/TS source files using Vite",
   "keywords": [
     "demo",
