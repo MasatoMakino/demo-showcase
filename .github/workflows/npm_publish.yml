@@ -42,8 +42,8 @@ jobs:
         id: resolve_tag
         run: |
           TAG_REF=$(gh api "repos/${REPO}/git/ref/tags/${TAG}" \
-            --jq '.object.sha + " " + .object.type' 2>/dev/null) || {
-            echo "::error::Tag $TAG does not exist in repository"
+            --jq '.object.sha + " " + .object.type') || {
+            echo "::error::Failed to look up tag $TAG"
             exit 1
           }
           TAG_OBJ_SHA=$(echo "$TAG_REF" | cut -d' ' -f1)
@@ -52,7 +52,7 @@ jobs:
             COMMIT_SHA="$TAG_OBJ_SHA"
           else
             COMMIT_SHA=$(gh api "repos/${REPO}/git/tags/${TAG_OBJ_SHA}" \
-              --jq '.object.sha' 2>/dev/null) || {
+              --jq '.object.sha') || {
               echo "::error::Failed to resolve annotated tag $TAG"
               exit 1
             }
@@ -94,12 +94,12 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           ref: ${{ needs.validate.outputs.commit_sha }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
         with:
           node-version: "22"
           cache: "npm"
