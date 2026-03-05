@@ -1,66 +1,86 @@
 name: Publish to npm
+# Usage:
+#   CLI: gh workflow run npm_publish.yml --ref v1.0.0
+#   Web: Actions > "Publish to npm" > select tag from "Use workflow from" dropdown > Run
 
 on:
   workflow_dispatch:
-    inputs:
-      tag:
-        description: "Git tag to publish (e.g., v0.2.0)"
-        required: true
-        type: string
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   validate:
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REF: ${{ github.ref }}
+      TAG: ${{ github.ref_name }}
+      REPO: ${{ github.repository }}
+      DISPATCH_SHA: ${{ github.sha }}
     outputs:
       version: ${{ steps.extract.outputs.version }}
+      commit_sha: ${{ steps.resolve_tag.outputs.sha }}
     steps:
+      - name: Verify dispatch ref is a tag
+        run: |
+          if [[ "$REF" != refs/tags/* ]]; then
+            echo "::error::Workflow must be dispatched from a tag ref, got: $REF"
+            exit 1
+          fi
+
       - name: Validate tag format
-        env:
-          TAG: ${{ inputs.tag }}
         run: |
           if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "::error::Invalid tag format: $TAG (expected v*.*.* pattern)"
             exit 1
           fi
 
-      - name: Verify tag exists
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TAG: ${{ inputs.tag }}
+      - name: Verify tag exists and resolve commit SHA
+        id: resolve_tag
         run: |
-          gh api "repos/${{ github.repository }}/git/ref/tags/${TAG}" \
-            --jq '.ref' > /dev/null 2>&1 || {
+          TAG_REF=$(gh api "repos/${REPO}/git/ref/tags/${TAG}" \
+            --jq '.object.sha + " " + .object.type' 2>/dev/null) || {
             echo "::error::Tag $TAG does not exist in repository"
             exit 1
           }
-          echo "Tag $TAG exists"
+          TAG_OBJ_SHA=$(echo "$TAG_REF" | cut -d' ' -f1)
+          TAG_OBJ_TYPE=$(echo "$TAG_REF" | cut -d' ' -f2)
+          if [ "$TAG_OBJ_TYPE" = "commit" ]; then
+            COMMIT_SHA="$TAG_OBJ_SHA"
+          else
+            COMMIT_SHA=$(gh api "repos/${REPO}/git/tags/${TAG_OBJ_SHA}" \
+              --jq '.object.sha' 2>/dev/null) || {
+              echo "::error::Failed to resolve annotated tag $TAG"
+              exit 1
+            }
+          fi
+          if [ "$COMMIT_SHA" != "$DISPATCH_SHA" ]; then
+            echo "::error::Tag commit ($COMMIT_SHA) differs from dispatch commit ($DISPATCH_SHA). Tag may have been force-moved."
+            exit 1
+          fi
+          echo "Tag $TAG verified at commit $COMMIT_SHA"
+          echo "sha=$COMMIT_SHA" >> "$GITHUB_OUTPUT"
 
       - name: Verify GitHub Release is published
-        env:
-          GH_TOKEN: ${{ github.token }}
-          TAG: ${{ inputs.tag }}
         run: |
-          RELEASE_INFO=$(gh api "repos/${{ github.repository }}/releases/tags/${TAG}" \
-            --jq '{draft: .draft, name: .name}' 2>&1) || {
+          RELEASE=$(gh api "repos/${REPO}/releases/tags/${TAG}" \
+            --jq '[.draft, .name] | @tsv') || {
             echo "::error::No GitHub Release found for tag $TAG"
             exit 1
           }
-          IS_DRAFT=$(echo "$RELEASE_INFO" | jq -r '.draft')
+          IS_DRAFT=$(echo "$RELEASE" | cut -f1)
+          RELEASE_NAME=$(echo "$RELEASE" | cut -f2)
           if [ "$IS_DRAFT" = "true" ]; then
             echo "::error::Release for $TAG is still a draft"
             exit 1
           fi
-          RELEASE_NAME=$(echo "$RELEASE_INFO" | jq -r '.name')
           echo "Release verified: $RELEASE_NAME"
 
       - name: Extract version from tag
         id: extract
-        env:
-          TAG: ${{ inputs.tag }}
         run: |
           VERSION="$TAG"
           VERSION="${VERSION#v}"
@@ -74,26 +94,27 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
-          ref: ${{ inputs.tag }}
+          ref: ${{ needs.validate.outputs.commit_sha }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
+        with:
+          node-version: "22"
+          cache: "npm"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Verify package.json version matches tag
+        env:
+          TAG_VERSION: ${{ needs.validate.outputs.version }}
         run: |
           PKG_VERSION=$(node -p "require('./package.json').version")
-          TAG_VERSION="${{ needs.validate.outputs.version }}"
           if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
             echo "::error::package.json version ($PKG_VERSION) does not match tag ($TAG_VERSION)"
             exit 1
           fi
           echo "Version match: $PKG_VERSION"
-
-      - name: Setup Node.js
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
-        with:
-          node-version: "22"
-          cache: "npm"
-          registry-url: "https://registry.npmjs.org"
 
       - name: Upgrade npm for OIDC trusted publishing
         run: npm install -g "npm@^11.10.0"
