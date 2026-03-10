@@ -1,6 +1,6 @@
 # @masatomakino/demo-showcase
 
-[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 [![npm version](https://img.shields.io/npm/v/@masatomakino/demo-showcase.svg?style=flat)](https://www.npmjs.com/package/@masatomakino/demo-showcase)
 [![CI](https://github.com/MasatoMakino/demo-showcase/actions/workflows/ci.yml/badge.svg)](https://github.com/MasatoMakino/demo-showcase/actions/workflows/ci.yml)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-blue?logo=github&style=flat)](https://github.com/MasatoMakino/demo-showcase)
