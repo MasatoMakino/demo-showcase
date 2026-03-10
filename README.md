@@ -1,5 +1,10 @@
 # @masatomakino/demo-showcase
 
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
+[![npm version](https://img.shields.io/npm/v/@masatomakino/demo-showcase.svg?style=flat)](https://www.npmjs.com/package/@masatomakino/demo-showcase)
+[![CI](https://github.com/MasatoMakino/demo-showcase/actions/workflows/ci.yml/badge.svg)](https://github.com/MasatoMakino/demo-showcase/actions/workflows/ci.yml)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-blue?logo=github&style=flat)](https://github.com/MasatoMakino/demo-showcase)
+
 A CLI tool that generates demo HTML pages from JavaScript/TypeScript source files using Vite.
 
 Place demo source files (e.g. `demo_*.ts`) in a directory, and this tool generates a browsable demo site with sidebar navigation — both as a dev server with HMR and as a static build.
