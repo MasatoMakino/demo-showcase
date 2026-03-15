@@ -5,9 +5,8 @@ import { initOptions } from "../src/Option.js";
 const option = initOptions();
 const plugin = demoPlugin(option, []);
 
-type ResolveIdFn = (source: string, importer?: string) => string | undefined;
-
-const resolveId = (plugin as { resolveId: ResolveIdFn }).resolveId;
+// biome-ignore lint/complexity/noBannedTypes: Vite Plugin's resolveId is an ObjectHook, not directly castable to a specific function signature
+const resolveId = (plugin as { resolveId: Function }).resolveId;
 
 describe("DemoPlugin resolveId", () => {
   it("should resolve ./indexScript.js from index.html", () => {
