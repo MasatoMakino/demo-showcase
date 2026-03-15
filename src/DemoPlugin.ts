@@ -26,7 +26,7 @@ export function demoPlugin(
     resolveId(source: string, importer?: string) {
       if (
         (source === "/indexScript.js" || source === "./indexScript.js") &&
-        importer?.endsWith("/index.html")
+        importer?.split("?")[0].endsWith("/index.html")
       ) {
         return resolvedIndexScript;
       }
