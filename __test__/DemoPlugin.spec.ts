@@ -5,8 +5,9 @@ import { initOptions } from "../src/Option.js";
 const option = initOptions();
 const plugin = demoPlugin(option, []);
 
-// Extract resolveId from the plugin object
-const resolveId = (plugin as { resolveId: Function }).resolveId;
+type ResolveIdFn = (source: string, importer?: string) => string | undefined;
+
+const resolveId = (plugin as { resolveId: ResolveIdFn }).resolveId;
 
 describe("DemoPlugin resolveId", () => {
   it("should resolve ./indexScript.js from index.html", () => {
