@@ -1,8 +1,7 @@
 /**
  * Extract demo name from path and return URL-encoded demo name (e.g. "sub/demoSub.html" -> "sub%2FdemoSub")
  */
-// biome-ignore lint/correctness/noUnusedVariables: used for demo name extraction
-function getDemoNameFromPath(path) {
+export function getDemoNameFromPath(path) {
   if (!path) return null;
 
   var demoPath = path;

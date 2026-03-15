@@ -73,7 +73,15 @@ The index page is a sidebar + iframe layout (Pure.css), not a single-page applic
 
 - Each demo runs in an isolated iframe (no global state leakage between demos)
 - URL query parameter (`?demo=name`) enables deep linking to specific demos
-- `indexScript.js` is deliberately not bundled by Vite (no `type="module"`) to keep it simple and self-contained
+- `indexScript.js` is an ES module (`export function getDemoNameFromPath`), imported by the inline `<script type="module">` in `index.html` and bundled by Vite in build mode
+
+#### Dev Mode: resolveId Workaround
+
+In build mode, `HtmlGenerator.copyIndexScript()` copies `indexScript.js` to the staging directory, allowing Vite to resolve the `import` from the filesystem naturally.
+
+In dev mode, `index.html` is generated dynamically by DemoPlugin middleware — no physical HTML file exists. Vite extracts the inline `<script type="module">` as a virtual module (`/index.html?html-proxy&index=0.js`) and attempts to resolve `./indexScript.js` from that virtual path, which fails because the file is in the `template/` directory, not in the project root.
+
+`DemoPlugin.resolveId()` bridges this gap by mapping `./indexScript.js` (when imported from `index.html`) to the actual `template/indexScript.js` path. This is a necessary workaround for the dynamic HTML generation architecture — build mode does not need it because the staging directory provides filesystem-based resolution.
 
 ### 8. No External Config Injection
 

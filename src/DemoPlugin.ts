@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import type { Plugin, ViteDevServer } from "vite";
 import { buildIndexHtmlString } from "./HtmlGenerator.js";
 import { replaceExtension } from "./htmlUtils.js";
@@ -16,8 +17,20 @@ export function demoPlugin(
   option: InitializedOption,
   demoEntries: string[],
 ): Plugin {
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const templateDir = path.resolve(__dirname, "../template/");
+  const resolvedIndexScript = path.join(templateDir, "indexScript.js");
+
   return {
     name: "demo-showcase",
+    resolveId(source: string, importer?: string) {
+      if (
+        (source === "/indexScript.js" || source === "./indexScript.js") &&
+        importer?.split("?")[0].endsWith("/index.html")
+      ) {
+        return resolvedIndexScript;
+      }
+    },
     configureServer(server: ViteDevServer) {
       // Watch srcDir for new/removed demo files
       const srcDir = path.resolve(server.config.root, option.srcDir);
@@ -99,10 +112,6 @@ export function demoPlugin(
         }
 
         // Serve static assets from template dir
-        const templateDir = path.resolve(
-          path.dirname(new URL(import.meta.url).pathname),
-          "../template/",
-        );
         const templateAssetPath = path.join(templateDir, cleanUrl);
         if (
           fs.existsSync(templateAssetPath) &&

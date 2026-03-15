@@ -15,8 +15,9 @@
     />
     <link rel="stylesheet" href="styles.css" type="text/css"/>
 
-    <script src="./indexScript.js"></script>
-    <script>
+    <script type="module">
+        import { getDemoNameFromPath } from './indexScript.js';
+
         document.addEventListener("DOMContentLoaded", (e) => {
 
             var menuItems = document.getElementsByClassName('pure-menu-item');

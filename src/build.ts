@@ -1,7 +1,6 @@
 import fsPromises from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { build as viteBuild } from "vite";
 import { discoverDemoEntries } from "./entries.js";
 import { generateIndexHtml } from "./HtmlGenerator.js";
@@ -56,9 +55,6 @@ export async function buildDemo(option: InitializedOption): Promise<void> {
     // Build with Vite
     const config = createBuildConfig(option, inputs, stagingDir);
     await viteBuild(config);
-
-    // Copy indexScript.js to distDir (not bundled by Vite since it lacks type="module")
-    await copyIndexScriptToDist(option);
   } finally {
     // Clean up staging directory
     await fsPromises.rm(stagingDir, { recursive: true, force: true });
@@ -119,15 +115,4 @@ async function generateStagingIndexHtml(
 async function copyTemplateAssets(stagingDir: string): Promise<void> {
   const styleTask = getStyleTask(stagingDir);
   await styleTask();
-}
-
-async function copyIndexScriptToDist(option: InitializedOption): Promise<void> {
-  const __dirname = path.dirname(fileURLToPath(import.meta.url));
-  const srcPath = path.resolve(__dirname, "../template/indexScript.js");
-  const destPath = path.resolve(
-    process.cwd(),
-    option.distDir,
-    "indexScript.js",
-  );
-  await fsPromises.copyFile(srcPath, destPath);
 }

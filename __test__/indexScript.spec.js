@@ -1,19 +1,5 @@
-import fs from "node:fs";
-import path from "node:path";
-import vm from "node:vm";
 import { describe, expect, it } from "vitest";
-
-// Read the script file content
-const scriptPath = path.resolve(__dirname, "../template/indexScript.js");
-const scriptContent = fs.readFileSync(scriptPath, "utf-8");
-
-// Create a new context and run the script
-const context = {};
-vm.createContext(context);
-vm.runInContext(scriptContent, context);
-
-// Access the globally defined function from the context
-const { getDemoNameFromPath } = context;
+import { getDemoNameFromPath } from "../template/indexScript.js";
 
 describe("getDemoNameFromPath", () => {
   it("should extract the demo name from a valid path", () => {
