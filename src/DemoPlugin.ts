@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import type { Plugin, ViteDevServer } from "vite";
 import { buildIndexHtmlString } from "./HtmlGenerator.js";
 import { replaceExtension } from "./htmlUtils.js";
@@ -16,19 +17,18 @@ export function demoPlugin(
   option: InitializedOption,
   demoEntries: string[],
 ): Plugin {
-  const templateDir = path.resolve(
-    path.dirname(new URL(import.meta.url).pathname),
-    "../template/",
-  );
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const templateDir = path.resolve(__dirname, "../template/");
+  const resolvedIndexScript = path.join(templateDir, "indexScript.js");
 
   return {
     name: "demo-showcase",
     resolveId(source: string, importer?: string) {
       if (
         (source === "/indexScript.js" || source === "./indexScript.js") &&
-        importer?.includes("index.html")
+        importer?.endsWith("/index.html")
       ) {
-        return path.join(templateDir, "indexScript.js");
+        return resolvedIndexScript;
       }
     },
     configureServer(server: ViteDevServer) {
