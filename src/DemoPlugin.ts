@@ -16,8 +16,18 @@ export function demoPlugin(
   option: InitializedOption,
   demoEntries: string[],
 ): Plugin {
+  const templateDir = path.resolve(
+    path.dirname(new URL(import.meta.url).pathname),
+    "../template/",
+  );
+
   return {
     name: "demo-showcase",
+    resolveId(source: string) {
+      if (source === "/indexScript.js" || source === "./indexScript.js") {
+        return path.join(templateDir, "indexScript.js");
+      }
+    },
     configureServer(server: ViteDevServer) {
       // Watch srcDir for new/removed demo files
       const srcDir = path.resolve(server.config.root, option.srcDir);
