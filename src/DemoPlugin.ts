@@ -23,8 +23,11 @@ export function demoPlugin(
 
   return {
     name: "demo-showcase",
-    resolveId(source: string) {
-      if (source === "/indexScript.js" || source === "./indexScript.js") {
+    resolveId(source: string, importer?: string) {
+      if (
+        (source === "/indexScript.js" || source === "./indexScript.js") &&
+        importer?.includes("index.html")
+      ) {
         return path.join(templateDir, "indexScript.js");
       }
     },
@@ -109,10 +112,6 @@ export function demoPlugin(
         }
 
         // Serve static assets from template dir
-        const templateDir = path.resolve(
-          path.dirname(new URL(import.meta.url).pathname),
-          "../template/",
-        );
         const templateAssetPath = path.join(templateDir, cleanUrl);
         if (
           fs.existsSync(templateAssetPath) &&
