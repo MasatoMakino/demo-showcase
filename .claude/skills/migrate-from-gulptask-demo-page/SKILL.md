@@ -22,16 +22,35 @@ npm uninstall @masatomakino/gulptask-demo-page browser-sync
 
 | Script | Before | After |
 |--------|--------|-------|
-| `demo` | `npx @masatomakino/gulptask-demo-page ...` | `npx demo-showcase build` |
-| `server` | `browser-sync ./docs/demo -w ...` | `npx demo-showcase dev` |
+| `demo` | `npx @masatomakino/gulptask-demo-page ...` | `npx demo-showcase build --distDir ./docs/demo` |
+| `server` | `browser-sync ./docs/demo -w ...` | `npx demo-showcase dev --host 0.0.0.0 --port 3456` |
 | `watch:demo` | `npm run demo -- -W` | **Delete** (dev server handles file watching) |
 
 Notes:
-- `--compileModule` is unnecessary (Vite handles natively)
+- `--distDir` should be explicit to avoid relying on implicit defaults and for consistency with other scripts (e.g., typedoc `--out`)
+- `--port 3456` should be explicit to match the DevContainer port mapping and prevent config drift
 - `--host 0.0.0.0` is required when running the dev server inside a container (e.g., DevContainer, Docker) for port forwarding to the host
+- `--compileModule` is unnecessary (Vite handles natively)
 - If the project runs tsc and demo-showcase in parallel (e.g., `start:dev`), remove the `watch:demo` part and replace the server command
 
-### 3. Update CI workflow (if applicable)
+### 3. Update DevContainer port mapping (if applicable)
+
+If the project uses a DevContainer with port forwarding for browser-sync (typically port `3000`), update to the demo-showcase default port (`3456`):
+
+```json
+"-p",
+"127.0.0.1:0:3456"
+```
+
+**Important:** Changing `devcontainer.json` does not affect a running container. The container must be recreated:
+
+```bash
+docker stop <container-name>
+docker rm <container-name>
+devcontainer up --workspace-folder .
+```
+
+### 4. Update CI workflow (if applicable)
 
 If CI invokes `demo-showcase build`, ensure Node version meets `engines.node >= 22.0.0`:
 
@@ -41,7 +60,7 @@ node-version: "22"
 
 Test-only CI that doesn't run the build does not need this change.
 
-### 4. Clean output directory
+### 5. Clean output directory
 
 Delete and regenerate `docs/demo/` (or custom `distDir`) to avoid stale files from the old builder:
 
@@ -50,11 +69,11 @@ rm -rf docs/demo/
 npm run build
 ```
 
-### 5. Demo source files
+### 6. Demo source files
 
 **No changes required.** Existing `demoSrc/demo_*.js` (or `.ts`) files work as-is in both build and dev modes.
 
-### 6. Asset references (images, etc.)
+### 7. Asset references (images, etc.)
 
 demo-showcase uses Vite's native asset import mechanism. If demo scripts reference images or other assets via string literals, migrate to Vite import syntax:
 
@@ -131,7 +150,8 @@ This is a general Vite behavior, not specific to demo-showcase. Production build
 ## Verification Checklist
 
 1. **Build**: `npm run build` → output directory contains `index.html`, `demo_*.html`, and asset files
-2. **Dev server**: dev server starts and pages are accessible via browser
-3. **HMR**: Edit a file in `demoSrc/` → browser reloads automatically
-4. **Asset loading**: Images and other assets load without 404 in dev mode
-5. **Tests**: `npm test` → all existing tests pass
+2. **Build preview**: `npx vite preview --outDir docs/demo --port 3456 --host 0.0.0.0` → built demo pages are accessible and functional in browser
+3. **Dev server**: `npm run start:dev` → dev server starts and pages are accessible via browser
+4. **HMR**: While the dev server is running, add a visible DOM element (e.g., `<p>` tag) to a demo source file → browser reloads automatically and the change is visible without manual refresh
+5. **Asset loading**: Images and other assets load without 404 in dev mode
+6. **Tests**: `npm test` → all existing tests pass
