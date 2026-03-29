@@ -8,7 +8,7 @@ A CLI tool that generates demo HTML pages from JavaScript/TypeScript source file
 
 ## Development Environment
 
-**IMPORTANT**: This project uses DevContainer to isolate npm execution from the host OS for security purposes. All npm commands must be executed inside the DevContainer.
+**IMPORTANT**: This project uses DevContainer to isolate pnpm execution from the host OS for security purposes. All pnpm commands must be executed inside the DevContainer.
 
 ### Prerequisites
 
@@ -25,7 +25,8 @@ devcontainer stop --workspace-folder .
 
 ### Architecture
 
-- Base image: `node:22-bookworm-slim`
+- Base image: `node:22-bookworm-slim` (via `.devcontainer/Dockerfile`)
+- Package manager: pnpm (installed globally in Dockerfile)
 - Security: `--cap-drop=ALL` (removes all Linux capabilities)
 - Non-root user: `node` (UID:1000, GID:1000)
 
@@ -35,21 +36,21 @@ devcontainer stop --workspace-folder .
 
 ### Build and Test
 
-- `devcontainer exec --workspace-folder . npm run build` - Build TypeScript to JavaScript (uses `tsc`)
-- `devcontainer exec --workspace-folder . npm run watch` - Watch TypeScript files and build continuously
-- `devcontainer exec --workspace-folder . npm test` - Run full test suite (vitest + build + testRun)
-- `devcontainer exec --workspace-folder . npm run test:watch` - Run tests in watch mode
-- `devcontainer exec --workspace-folder . npm run coverage` - Generate test coverage report
+- `devcontainer exec --workspace-folder . pnpm run build` - Build TypeScript to JavaScript (uses `tsc`)
+- `devcontainer exec --workspace-folder . pnpm run watch` - Watch TypeScript files and build continuously
+- `devcontainer exec --workspace-folder . pnpm test` - Run full test suite (vitest + build + testRun)
+- `devcontainer exec --workspace-folder . pnpm run test:watch` - Run tests in watch mode
+- `devcontainer exec --workspace-folder . pnpm run coverage` - Generate test coverage report
 
 ### Dev Server
 
-- `devcontainer exec --workspace-folder . npm run dev` - Start dev server (port 3456, host 0.0.0.0)
-- Use `docker port demo-showcase-npm-runner 3456` to find the host port
+- `devcontainer exec --workspace-folder . pnpm run dev` - Start dev server (port 3456, host 0.0.0.0)
+- Use `docker port demo-showcase-pnpm-runner 3456` to find the host port
 - See `dev-server-lifecycle` skill for stop procedure
 
 ### CLI Testing
 
-- `devcontainer exec --workspace-folder . npm run testRun` - Test the built CLI tool with default options
+- `devcontainer exec --workspace-folder . pnpm run testRun` - Test the built CLI tool with default options
 
 ### Code Quality
 
@@ -149,5 +150,5 @@ Templates use plain HTML with `{{PLACEHOLDER}}` markers replaced by `HtmlGenerat
 
 After code changes:
 
-1. Run `devcontainer exec --workspace-folder . npm test` - verify unit tests, build, and demo page build succeed
+1. Run `devcontainer exec --workspace-folder . pnpm test` - verify unit tests, build, and demo page build succeed
 2. Open `docs/demo/index.html` in browser and verify sidebar navigation and demo pages work
