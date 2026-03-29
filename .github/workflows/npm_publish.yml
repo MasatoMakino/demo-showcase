@@ -90,8 +90,14 @@ jobs:
 
       - name: Validate package.json fields
         run: |
-          NAME=$(jq -r .name package.json)
-          VERSION=$(jq -r .version package.json)
+          NAME=$(jq -er '.name | select(type == "string" and length > 0)' package.json) || {
+            echo "::error::package.json name must be a non-empty string"
+            exit 1
+          }
+          VERSION=$(jq -er '.version | select(type == "string" and length > 0)' package.json) || {
+            echo "::error::package.json version must be a non-empty string"
+            exit 1
+          }
           if [[ ! "$NAME" =~ ^(@[a-z0-9._-]+/)?[a-z0-9._-]+$ ]]; then
             echo "::error::Invalid package name: ${NAME}"
             exit 1
@@ -171,7 +177,9 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Upgrade npm for OIDC trusted publishing
-        run: npm install -g "npm@^11.10.0"
+        run: >-
+          npm install -g "npm@11.12.1"
+          --integrity="sha512-zcoUuF1kezGSAo0CqtvoLXX3mkRqzuqYdL6Y5tdo8g69NVV3CkjQ6ZBhBgB4d7vGkPcV6TcvLi3GRKPDFX+xTA=="
 
       - name: Publish package on npm
         shell: bash
