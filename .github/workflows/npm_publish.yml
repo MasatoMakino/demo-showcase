@@ -6,11 +6,10 @@ name: Publish to npm
 on:
   workflow_dispatch:
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
-  validate:
+  build:
     runs-on: ubuntu-22.04
     permissions:
       contents: read
@@ -20,9 +19,6 @@ jobs:
       TAG: ${{ github.ref_name }}
       REPO: ${{ github.repository }}
       DISPATCH_SHA: ${{ github.sha }}
-    outputs:
-      version: ${{ steps.extract.outputs.version }}
-      commit_sha: ${{ steps.resolve_tag.outputs.sha }}
     steps:
       - name: Verify dispatch ref is a tag
         run: |
@@ -86,39 +82,64 @@ jobs:
           VERSION="${VERSION#v}"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-  publish:
-    needs: validate
-    runs-on: ubuntu-22.04
-    environment: npm-publish
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          ref: ${{ needs.validate.outputs.commit_sha }}
+          ref: ${{ steps.resolve_tag.outputs.sha }}
           persist-credentials: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
-        with:
-          node-version: "22"
-          cache: "npm"
-          registry-url: "https://registry.npmjs.org"
+      - name: Validate package.json fields
+        run: |
+          NAME=$(jq -er '.name | select(type == "string" and length > 0)' package.json) || {
+            echo "::error::package.json name must be a non-empty string"
+            exit 1
+          }
+          VERSION=$(jq -er '.version | select(type == "string" and length > 0)' package.json) || {
+            echo "::error::package.json version must be a non-empty string"
+            exit 1
+          }
+          if [[ ! "$NAME" =~ ^(@[a-z0-9._-]+/)?[a-z0-9._-]+$ ]]; then
+            echo "::error::Invalid package name: ${NAME}"
+            exit 1
+          fi
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
+            echo "::error::Invalid version format: ${VERSION}"
+            exit 1
+          fi
+          echo "Package: ${NAME}@${VERSION}"
+          echo "Files field: $(jq -r '(.files // ["*"]) | join(", ")' package.json)"
 
       - name: Verify package.json version matches tag
         env:
-          TAG_VERSION: ${{ needs.validate.outputs.version }}
+          TAG_VERSION: ${{ steps.extract.outputs.version }}
         run: |
-          PKG_VERSION=$(node -p "require('./package.json').version")
+          PKG_VERSION=$(jq -r .version package.json)
           if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
             echo "::error::package.json version ($PKG_VERSION) does not match tag ($TAG_VERSION)"
             exit 1
           fi
           echo "Version match: $PKG_VERSION"
 
-      - name: Upgrade npm for OIDC trusted publishing
-        run: npm install -g "npm@^11.10.0"
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Verify version is not already published
+        run: |
+          NAME=$(jq -r .name package.json)
+          VERSION=$(jq -r .version package.json)
+          if npm view "${NAME}@${VERSION}" version >/dev/null 2>/tmp/npm-view.err; then
+            echo "::error::Version ${VERSION} is already published on npm"
+            exit 1
+          elif grep -Eq 'E404|404[[:space:]]+Not Found' /tmp/npm-view.err; then
+            echo "Version ${VERSION} is not yet published — OK"
+          else
+            cat /tmp/npm-view.err >&2
+            echo "::error::Unable to determine whether ${NAME}@${VERSION} already exists on npm"
+            exit 1
+          fi
 
       - name: Install dependencies
         run: npm ci
@@ -126,5 +147,47 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Publish to npm
-        run: npm publish --access public --provenance
+      - name: Pack
+        run: npm pack
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: masatomakino-demo-showcase
+          path: "*.tgz"
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    needs: build
+    runs-on: ubuntu-22.04
+    environment: npm-publish
+    permissions:
+      id-token: write
+    steps:
+      - name: Download package artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: masatomakino-demo-showcase
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Upgrade npm for OIDC trusted publishing
+        run: >-
+          npm install -g "npm@11.12.1"
+          --integrity="sha512-zcoUuF1kezGSAo0CqtvoLXX3mkRqzuqYdL6Y5tdo8g69NVV3CkjQ6ZBhBgB4d7vGkPcV6TcvLi3GRKPDFX+xTA=="
+
+      - name: Publish package on npm
+        shell: bash
+        run: |
+          shopt -s nullglob
+          set -- *.tgz
+          if [ "$#" -ne 1 ]; then
+            echo "::error::Expected exactly one .tgz file, found: $#"
+            exit 1
+          fi
+          npm publish "$1" --provenance --access public
