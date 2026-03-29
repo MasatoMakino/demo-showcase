@@ -39,7 +39,7 @@ If the project uses a DevContainer with port forwarding for browser-sync (typica
 
 ```json
 "-p",
-"127.0.0.1:0:3456"
+"127.0.0.1::3456"
 ```
 
 **Important:** Changing `devcontainer.json` does not affect a running container. The container must be recreated:
@@ -151,7 +151,7 @@ This is a general Vite behavior, not specific to demo-showcase. Production build
 
 1. **Build**: `npm run build` → output directory contains `index.html`, `demo_*.html`, and asset files
 2. **Build preview**: `npx vite preview --outDir docs/demo --port 3456 --host 0.0.0.0` → built demo pages are accessible and functional in browser
-3. **Dev server**: `npm run start:dev` → dev server starts and pages are accessible via browser
+3. **Dev server**: dev server starts and pages are accessible via browser
 4. **HMR**: While the dev server is running, add a visible DOM element (e.g., `<p>` tag) to a demo source file → browser reloads automatically and the change is visible without manual refresh
 5. **Asset loading**: Images and other assets load without 404 in dev mode
 6. **Tests**: `npm test` → all existing tests pass
