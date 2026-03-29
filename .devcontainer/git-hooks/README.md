@@ -60,6 +60,6 @@ git push origin HEAD
 
 ## Notes
 
-- These hooks run npm commands inside the DevContainer
+- These hooks run pnpm commands inside the DevContainer
 - Each developer must set up hooks manually (`.git/hooks/` is not tracked by git)
 - Hooks require DevContainer to be running or will start it automatically
