@@ -35,7 +35,7 @@
     "@types/node": "^25.0.10",
     "@vitest/coverage-istanbul": "4.1.0",
     "vitest": "4.1.0",
-    "typescript": "^5.7.0"
+    "typescript": "^6.0.2"
   },
   "scripts": {
     "test": "vitest --run && pnpm run build && pnpm run testRun",
