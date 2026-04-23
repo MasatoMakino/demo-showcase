@@ -5,6 +5,7 @@
     "declaration": true,
     "declarationMap": true,
     "outDir": "./bin",
+    "rootDir": "./src",
     "moduleResolution": "node16",
     "esModuleInterop": true,
     "strict": true
