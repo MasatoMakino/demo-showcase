@@ -24,7 +24,7 @@
   "author": "MasatoMakino <unagiinu.g@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "commander": "^14.0.0",
+    "commander": "^15.0.0",
     "glob": "^13.0.0",
     "mrmime": "^2.0.1",
     "vite": "8.0.8",
