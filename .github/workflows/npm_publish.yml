@@ -127,7 +127,6 @@ jobs:
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "22"
-          cache: "pnpm"
 
       - name: Verify version is not already published
         run: |
@@ -176,13 +175,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: "22"
+          # Node 26 bundles npm 11.20+, which meets the npm 11.5.1+ requirement of OIDC trusted publishing.
+          node-version: "26"
           registry-url: "https://registry.npmjs.org"
-
-      - name: Upgrade npm for OIDC trusted publishing
-        run: >-
-          npm install -g "npm@11.12.1"
-          --integrity="sha512-zcoUuF1kezGSAo0CqtvoLXX3mkRqzuqYdL6Y5tdo8g69NVV3CkjQ6ZBhBgB4d7vGkPcV6TcvLi3GRKPDFX+xTA=="
 
       - name: Publish package on npm
         shell: bash
