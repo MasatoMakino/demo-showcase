@@ -124,21 +124,21 @@ Templates use plain HTML with `{{PLACEHOLDER}}` markers replaced by `HtmlGenerat
 
 ### Shared Options
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `--prefix <string>` | `"demo"` | Filename prefix for demo pages |
-| `--srcDir <path>` | `"./demoSrc"` | Demo source directory |
-| `--distDir <path>` | `"./docs/demo"` | Output directory (build mode) |
-| `--body <string>` | `""` | HTML body content |
-| `--style <string>` | `""` | Custom CSS styles |
+| Option              | Default         | Description                    |
+| ------------------- | --------------- | ------------------------------ |
+| `--prefix <string>` | `"demo"`        | Filename prefix for demo pages |
+| `--srcDir <path>`   | `"./demoSrc"`   | Demo source directory          |
+| `--distDir <path>`  | `"./docs/demo"` | Output directory (build mode)  |
+| `--body <string>`   | `""`            | HTML body content              |
+| `--style <string>`  | `""`            | Custom CSS styles              |
 
 ### Dev-only Options
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `--port <number>` | `3456` | Dev server port |
-| `--open` | `false` | Open browser on start |
-| `--host <string>` | `"localhost"` | Dev server host |
+| Option            | Default       | Description           |
+| ----------------- | ------------- | --------------------- |
+| `--port <number>` | `3456`        | Dev server port       |
+| `--open`          | `false`       | Open browser on start |
+| `--host <string>` | `"localhost"` | Dev server host       |
 
 ## Key Configuration
 

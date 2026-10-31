@@ -20,11 +20,11 @@ npm uninstall @masatomakino/gulptask-demo-page browser-sync
 
 ### 2. Update package.json scripts
 
-| Script | Before | After |
-|--------|--------|-------|
-| `demo` | `npx @masatomakino/gulptask-demo-page ...` | `npx demo-showcase build --distDir ./docs/demo` |
-| `server` | `browser-sync ./docs/demo -w ...` | `npx demo-showcase dev --host 0.0.0.0 --port 3456` |
-| `watch:demo` | `npm run demo -- -W` | **Delete** (dev server handles file watching) |
+| Script       | Before                                     | After                                              |
+| ------------ | ------------------------------------------ | -------------------------------------------------- |
+| `demo`       | `npx @masatomakino/gulptask-demo-page ...` | `npx demo-showcase build --distDir ./docs/demo`    |
+| `server`     | `browser-sync ./docs/demo -w ...`          | `npx demo-showcase dev --host 0.0.0.0 --port 3456` |
+| `watch:demo` | `npm run demo -- -W`                       | **Delete** (dev server handles file watching)      |
 
 Notes:
 - `--distDir` should be explicit to avoid relying on implicit defaults and for consistency with other scripts (e.g., typedoc `--out`)

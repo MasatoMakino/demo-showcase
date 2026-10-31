@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: read  # Required for actions/checkout
+  contents: read # Required for actions/checkout
 
 jobs:
   test:

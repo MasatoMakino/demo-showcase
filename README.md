@@ -35,16 +35,16 @@ Output goes to `./docs/demo/` by default.
 
 ## Options
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `--prefix <string>` | `"demo"` | Filename prefix for demo pages |
-| `--srcDir <path>` | `"./demoSrc"` | Demo source directory |
-| `--distDir <path>` | `"./docs/demo"` | Output directory (build only) |
-| `--body <string>` | `""` | HTML body content |
-| `--style <string>` | `""` | Custom CSS styles |
-| `--port <number>` | `3456` | Dev server port (dev only) |
-| `--open` | `false` | Open browser on start (dev only) |
-| `--host <string>` | `"localhost"` | Dev server host (dev only) |
+| Option              | Default         | Description                      |
+| ------------------- | --------------- | -------------------------------- |
+| `--prefix <string>` | `"demo"`        | Filename prefix for demo pages   |
+| `--srcDir <path>`   | `"./demoSrc"`   | Demo source directory            |
+| `--distDir <path>`  | `"./docs/demo"` | Output directory (build only)    |
+| `--body <string>`   | `""`            | HTML body content                |
+| `--style <string>`  | `""`            | Custom CSS styles                |
+| `--port <number>`   | `3456`          | Dev server port (dev only)       |
+| `--open`            | `false`         | Open browser on start (dev only) |
+| `--host <string>`   | `"localhost"`   | Dev server host (dev only)       |
 
 ## How it works
 
