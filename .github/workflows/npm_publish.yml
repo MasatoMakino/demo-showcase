@@ -35,7 +35,6 @@ jobs:
           fi
 
       - name: Verify tag exists and resolve commit SHA
-        id: resolve_tag
         run: |
           TAG_REF=$(gh api "repos/${REPO}/git/ref/tags/${TAG}" \
             --jq '.object.sha + " " + .object.type') || {
@@ -58,7 +57,6 @@ jobs:
             exit 1
           fi
           echo "Tag $TAG verified at commit $COMMIT_SHA"
-          echo "sha=$COMMIT_SHA" >> "$GITHUB_OUTPUT"
 
       - name: Verify GitHub Release is published
         run: |
@@ -85,7 +83,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ steps.resolve_tag.outputs.sha }}
           persist-credentials: false
 
       - name: Validate package.json fields
