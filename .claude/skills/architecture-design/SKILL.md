@@ -37,10 +37,10 @@ Rationale: The replacement targets are fixed and few (TITLE, STYLE, SCRIPT, BODY
 
 ### 4. Two-Mode Architecture
 
-| Mode | Purpose | HTML Strategy |
-|------|---------|---------------|
-| dev | Live preview | Dynamic generation via Vite plugin middleware |
-| build | Static output | Staging directory → Vite build → cleanup |
+| Mode  | Purpose       | HTML Strategy                                 |
+| ----- | ------------- | --------------------------------------------- |
+| dev   | Live preview  | Dynamic generation via Vite plugin middleware |
+| build | Static output | Staging directory → Vite build → cleanup      |
 
 Both modes share the same entry discovery and HTML generation logic (`buildIndexHtmlString()` in `HtmlGenerator.ts`) but differ in execution strategy. Dev mode avoids filesystem writes by serving HTML from memory; build mode uses a staging directory because Vite's build API requires physical files.
 
@@ -48,11 +48,11 @@ Both modes share the same entry discovery and HTML generation logic (`buildIndex
 
 Two independent mechanisms handle file changes:
 
-| Mechanism | Scope | Trigger |
-|-----------|-------|---------|
-| Vite module graph | All files reachable via import chain from root | Any file in the dependency graph changes |
-| `vite-plugin-full-reload` | `srcDir/**/*.{js,ts}` only | File change in srcDir |
-| DemoPlugin watcher | `srcDir` directory | Demo file added/removed → server restart |
+| Mechanism                 | Scope                                          | Trigger                                  |
+| ------------------------- | ---------------------------------------------- | ---------------------------------------- |
+| Vite module graph         | All files reachable via import chain from root | Any file in the dependency graph changes |
+| `vite-plugin-full-reload` | `srcDir/**/*.{js,ts}` only                     | File change in srcDir                    |
+| DemoPlugin watcher        | `srcDir` directory                             | Demo file added/removed → server restart |
 
 **Why full reload instead of HMR**: Demo scripts are plain JS/TS modules without HMR API (`import.meta.hot`). Vite falls back to full page reload for these. The `vite-plugin-full-reload` plugin ensures explicit reload rather than relying on Vite's fallback behavior.
 
