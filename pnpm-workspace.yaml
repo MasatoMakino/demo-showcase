@@ -1,2 +1,15 @@
 minimumReleaseAge: 10080
 trustPolicy: no-downgrade
+catalog:
+  vitest: 5.1.0
+  vite-plus: 1.6.0
+  "@vitest/coverage-istanbul": 5.1.0
+overrides:
+  vitest@*: "catalog:"
+peerDependencyRules:
+  allowAny:
+    - vite
+    - vitest
+  allowedVersions:
+    vite: "*"
+    vitest: "*"

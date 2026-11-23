@@ -1,6 +1,6 @@
 import fsPromises from "node:fs/promises";
 import path from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vite-plus/test";
 import { discoverDemoEntries } from "../src/entries.js";
 import { initOptions } from "../src/Option.js";
 
@@ -10,18 +10,9 @@ describe("discoverDemoEntries", () => {
   beforeEach(async () => {
     const srcDir = path.resolve(process.cwd(), testSrcDir);
     await fsPromises.mkdir(srcDir, { recursive: true });
-    await fsPromises.writeFile(
-      path.join(srcDir, "demoA.ts"),
-      "console.log('A');",
-    );
-    await fsPromises.writeFile(
-      path.join(srcDir, "demoB.js"),
-      "console.log('B');",
-    );
-    await fsPromises.writeFile(
-      path.join(srcDir, "helper.ts"),
-      "export const x = 1;",
-    );
+    await fsPromises.writeFile(path.join(srcDir, "demoA.ts"), "console.log('A');");
+    await fsPromises.writeFile(path.join(srcDir, "demoB.js"), "console.log('B');");
+    await fsPromises.writeFile(path.join(srcDir, "helper.ts"), "export const x = 1;");
   });
 
   afterEach(async () => {

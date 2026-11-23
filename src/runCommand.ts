@@ -24,18 +24,14 @@ export async function runCommand() {
   }
 
   // Build subcommand
-  const buildCmd = program
-    .command("build")
-    .description("Build static demo site");
+  const buildCmd = program.command("build").description("Build static demo site");
   addSharedOptions(buildCmd);
   buildCmd.action(async (args) => {
     await runBuild(args);
   });
 
   // Dev subcommand
-  const devCmd = program
-    .command("dev")
-    .description("Start dev server with HMR");
+  const devCmd = program.command("dev").description("Start dev server with HMR");
   addSharedOptions(devCmd);
   devCmd
     .option("--port <number>", "Dev server port", "3456")

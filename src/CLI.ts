@@ -2,4 +2,4 @@
 
 import { runCommand } from "./runCommand.js";
 
-runCommand();
+void runCommand();

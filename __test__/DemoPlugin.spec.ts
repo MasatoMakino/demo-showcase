@@ -1,12 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { demoPlugin } from "../src/DemoPlugin.js";
 import { initOptions } from "../src/Option.js";
 
 const option = initOptions();
 const plugin = demoPlugin(option, []);
 
-// Removal condition: when the Vite Plugin type exposes resolveId as a callable signature, remove this suppression.
-// biome-ignore lint/complexity/noBannedTypes: Vite Plugin's resolveId is an ObjectHook, not directly castable to a specific function signature
 const resolveId = (plugin as { resolveId: Function }).resolveId;
 
 describe("DemoPlugin resolveId", () => {
@@ -21,10 +19,7 @@ describe("DemoPlugin resolveId", () => {
   });
 
   it("should resolve from html-proxy importer with query parameters", () => {
-    const result = resolveId(
-      "./indexScript.js",
-      "/index.html?html-proxy&index=0.js",
-    );
+    const result = resolveId("./indexScript.js", "/index.html?html-proxy&index=0.js");
     expect(result).toMatch(/template\/indexScript\.js$/);
   });
 
@@ -34,12 +29,8 @@ describe("DemoPlugin resolveId", () => {
   });
 
   it("should not resolve from paths containing index.html as substring", () => {
-    expect(
-      resolveId("./indexScript.js", "/my-index.html-backup"),
-    ).toBeUndefined();
-    expect(
-      resolveId("./indexScript.js", "/old-index.html.bak"),
-    ).toBeUndefined();
+    expect(resolveId("./indexScript.js", "/my-index.html-backup")).toBeUndefined();
+    expect(resolveId("./indexScript.js", "/old-index.html.bak")).toBeUndefined();
     expect(resolveId("./indexScript.js", "/modal-index.html")).toBeUndefined();
   });
 

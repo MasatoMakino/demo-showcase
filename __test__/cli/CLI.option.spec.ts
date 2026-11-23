@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vite-plus/test";
 
 vi.mock("../../src/build.js", () => ({
   buildDemo: vi.fn().mockResolvedValue(undefined),
