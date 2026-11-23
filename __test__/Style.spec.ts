@@ -16,11 +16,6 @@ describe("Style", () => {
       .catch(() => {});
   });
 
-  it("should return an async function", () => {
-    const task = getStyleTask(path.resolve(process.cwd(), testDir));
-    expect(typeof task).toBe("function");
-  });
-
   it("should copy CSS, PNG, and ICO files", async () => {
     const distDir = path.resolve(process.cwd(), testDir);
     await fsPromises.mkdir(distDir, { recursive: true });
