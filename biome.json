@@ -8,7 +8,18 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!demoSrc", "!template/*.html", "!pnpm-lock.yaml"]
+    "includes": [
+      "**",
+      "!demoSrc",
+      "!template/*.html",
+      "!pnpm-lock.yaml",
+      "!.devcontainer",
+      "!.github",
+      "!.claude",
+      "!.vscode",
+      "!CLAUDE.md",
+      "!AGENTS.md"
+    ]
   },
   "formatter": {
     "enabled": true,
