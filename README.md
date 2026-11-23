@@ -31,7 +31,7 @@ npx demo-showcase dev --srcDir ./demoSrc
 npx demo-showcase build --srcDir ./demoSrc
 ```
 
-Output goes to `./docs/demo/` by default.
+Output goes to `./docs/demo/` by default. The output uses relative paths, so you can deploy it under any base path.
 
 ## Options
 
