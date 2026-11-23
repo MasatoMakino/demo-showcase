@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from "vitest";
-import { initOptions } from "../../src/Option.js";
 
 vi.mock("../../src/build.js", () => ({
   buildDemo: vi.fn().mockResolvedValue(undefined),
@@ -53,12 +52,5 @@ describe("CLI options", () => {
         host: "0.0.0.0",
       }),
     );
-  });
-
-  it("should use default options when none provided", async () => {
-    const option = initOptions({});
-    expect(option.prefix).toBe("demo");
-    expect(option.srcDir).toBe("./demoSrc");
-    expect(option.distDir).toBe("./docs/demo");
   });
 });

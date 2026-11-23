@@ -5,6 +5,7 @@ import { initOptions } from "../src/Option.js";
 const option = initOptions();
 const plugin = demoPlugin(option, []);
 
+// Removal condition: when the Vite Plugin type exposes resolveId as a callable signature, remove this suppression.
 // biome-ignore lint/complexity/noBannedTypes: Vite Plugin's resolveId is an ObjectHook, not directly castable to a specific function signature
 const resolveId = (plugin as { resolveId: Function }).resolveId;
 
