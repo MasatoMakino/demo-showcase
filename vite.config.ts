@@ -3,8 +3,6 @@ import { defineConfig } from "vite-plus";
 export default defineConfig({
   fmt: {
     ignorePatterns: [
-      // Templates hold {{PLACEHOLDER}} markers that HtmlGenerator replaces.
-      "template/*.html",
       // The DevContainer mounts these paths read-only.
       ".devcontainer/**",
       ".github/**",
