@@ -25,7 +25,7 @@ devcontainer stop --workspace-folder .
 
 ### Architecture
 
-- Base image: `node:24-bookworm-slim`, pinned by digest (via `.devcontainer/Dockerfile`)
+- Base image: `node:26-bookworm-slim`, pinned by digest (via `.devcontainer/Dockerfile`)
 - Package manager: pnpm (installed globally in Dockerfile, same version as `packageManager`)
 - Security: an iptables firewall allows outbound traffic only to the npm registry. `.git`, `.devcontainer`, `.github`, `.claude`, `.vscode`, `CLAUDE.md`, and `AGENTS.md` are mounted read-only. `node_modules` is a named volume. See `.devcontainer/DESIGN.md`
 - Non-root user: `node` (UID:1000, GID:1000)
