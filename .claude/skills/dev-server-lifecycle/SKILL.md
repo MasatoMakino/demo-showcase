@@ -8,15 +8,18 @@ description: Start and stop the demo-showcase dev server inside DevContainer. Us
 ## Start
 
 ```bash
-devcontainer exec --workspace-folder . npm run dev
+devcontainer exec --workspace-folder . pnpm run dev
 ```
 
-Runs on container port 3456 (mapped to a dynamic host port via `-p 0:3456`).
+Runs on container port 3456 (mapped to a dynamic host port on `127.0.0.1` via `-p 127.0.0.1:0:3456`).
 
 ### Discover Host Port
 
+The container name includes the `devcontainerId` of the folder. Read it by its label, then write the name literally in the next command:
+
 ```bash
-docker port demo-showcase-npm-runner 3456
+docker ps --filter label=devcontainer.local_folder=<absolute workspace path> --format '{{.Names}}'
+docker port <container> 3456
 ```
 
 Access `http://localhost:<host-port>` in the host browser.
@@ -50,6 +53,6 @@ Access `http://localhost:<host-port>` in the host browser.
 If processes persist:
 
 ```bash
-docker stop demo-showcase-npm-runner
+docker stop <container>
 devcontainer up --workspace-folder .
 ```

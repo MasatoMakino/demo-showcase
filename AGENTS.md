@@ -25,14 +25,16 @@ devcontainer stop --workspace-folder .
 
 ### Architecture
 
-- Base image: `node:22-bookworm-slim` (via `.devcontainer/Dockerfile`)
-- Package manager: pnpm (installed globally in Dockerfile)
-- Security: `--cap-drop=ALL` (removes all Linux capabilities)
+- Base image: `node:24-bookworm-slim`, pinned by digest (via `.devcontainer/Dockerfile`)
+- Package manager: pnpm (installed globally in Dockerfile, same version as `packageManager`)
+- Security: an iptables firewall allows outbound traffic only to the npm registry. `.git`, `.devcontainer`, `.github`, `.claude`, `.vscode`, `CLAUDE.md`, and `AGENTS.md` are mounted read-only. `node_modules` is a named volume. See `.devcontainer/DESIGN.md`
 - Non-root user: `node` (UID:1000, GID:1000)
 
 ## Development Commands
 
-**All commands must be run inside the DevContainer** using the `devcontainer exec` wrapper:
+**All commands must be run inside the DevContainer** using the `devcontainer exec` wrapper.
+
+Each worktree has its own DevContainer. In a new worktree, run `devcontainer up --workspace-folder .` once before the other commands.
 
 ### Build and Test
 
@@ -45,7 +47,7 @@ devcontainer stop --workspace-folder .
 ### Dev Server
 
 - `devcontainer exec --workspace-folder . pnpm run dev` - Start dev server (port 3456, host 0.0.0.0)
-- Use `docker port demo-showcase-pnpm-runner 3456` to find the host port
+- Find the container with `docker ps --filter label=devcontainer.local_folder=<absolute workspace path> --format '{{.Names}}'`, then run `docker port <container> 3456` to find the host port
 - See `dev-server-lifecycle` skill for stop procedure
 
 ### CLI Testing
@@ -57,9 +59,9 @@ devcontainer stop --workspace-folder .
 - Uses Biome for formatting and linting
 - Template HTML files (`template/*.html`) are excluded from Biome checks (placeholder markers cause parse errors)
 
-## Git Hooks Setup (Optional)
+## Git Hooks
 
-See `.devcontainer/git-hooks/README.md` for setup instructions.
+Git runs on the host. The `pre-commit` hook in `.git/hooks/` passes the staged files to `pnpm run pre-commit` in the DevContainer of the working tree, and re-stages them. It finds the container by its `devcontainer.local_folder` label and starts the container when it is stopped. CI runs the tests and the lint on each PR, so there is no `pre-push` hook.
 
 ## Architecture
 
