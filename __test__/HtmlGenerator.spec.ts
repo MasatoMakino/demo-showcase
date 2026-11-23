@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import fsPromises from "node:fs/promises";
 import path from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vite-plus/test";
 import { generateDemoHtml, generateIndexHtml } from "../src/HtmlGenerator.js";
 import { initOptions } from "../src/Option.js";
 

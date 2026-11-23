@@ -5,24 +5,42 @@
   "keywords": [
     "demo",
     "html-generator",
-    "typescript",
-    "static-site"
+    "static-site",
+    "typescript"
   ],
-  "type": "module",
-  "main": "bin/CLI.js",
-  "bin": {
-    "demo-showcase": "bin/CLI.js"
+  "homepage": "https://github.com/MasatoMakino/demo-showcase#readme",
+  "bugs": {
+    "url": "https://github.com/MasatoMakino/demo-showcase/issues"
   },
+  "license": "MIT",
+  "author": "MasatoMakino <unagiinu.g@gmail.com>",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MasatoMakino/demo-showcase.git"
+  },
+  "bin": {
+    "demo-showcase": "bin/CLI.js"
+  },
+  "directories": {
+    "doc": "docs"
   },
   "files": [
     "bin",
     "template"
   ],
-  "author": "MasatoMakino <unagiinu.g@gmail.com>",
-  "license": "MIT",
+  "type": "module",
+  "main": "bin/CLI.js",
+  "scripts": {
+    "test": "vp test --run && pnpm run build && pnpm run testRun",
+    "test:watch": "vp test",
+    "coverage": "vp test --run --coverage",
+    "build": "tsc",
+    "watch": "tsc -W",
+    "testRun": "node ./bin/CLI.js build --srcDir ./demoSrc",
+    "lint": "vp check",
+    "dev": "node ./bin/CLI.js dev --srcDir ./demoSrc --host 0.0.0.0",
+    "pre-commit": "vp check --fix --no-error-on-unmatched-pattern"
+  },
   "dependencies": {
     "commander": "^15.0.0",
     "glob": "^14.0.2",
@@ -31,32 +49,14 @@
     "vite-plugin-full-reload": "^1.2.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.0",
     "@types/node": "^26.6.3",
-    "@vitest/coverage-istanbul": "5.1.0",
+    "@vitest/coverage-istanbul": "catalog:",
     "typescript": "^7.0.2",
-    "vitest": "5.1.0"
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   },
-  "scripts": {
-    "test": "vitest --run && pnpm run build && pnpm run testRun",
-    "test:watch": "vitest",
-    "coverage": "vitest --run --coverage",
-    "build": "tsc",
-    "watch": "tsc -W",
-    "testRun": "node ./bin/CLI.js build --srcDir ./demoSrc",
-    "lint": "biome ci .",
-    "dev": "node ./bin/CLI.js dev --srcDir ./demoSrc --host 0.0.0.0",
-    "pre-commit": "biome check --write --no-errors-on-unmatched --files-ignore-unknown=true"
-  },
-  "bugs": {
-    "url": "https://github.com/MasatoMakino/demo-showcase/issues"
-  },
-  "homepage": "https://github.com/MasatoMakino/demo-showcase#readme",
   "engines": {
     "node": ">=22.0.0"
   },
-  "packageManager": "pnpm@12.16.1",
-  "directories": {
-    "doc": "docs"
-  }
+  "packageManager": "pnpm@12.16.1"
 }

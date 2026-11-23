@@ -27,6 +27,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "pnpm"
       - run: pnpm install --frozen-lockfile
-      - name: Run Biome
+      - name: Run Vite+ check
         run: pnpm run lint
       - run: pnpm test

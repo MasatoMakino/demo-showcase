@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import fsPromises from "node:fs/promises";
 import path from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vite-plus/test";
 import { getStyleTask } from "../src/Style.js";
 
 const testDir = "test_for_style";
@@ -24,9 +24,7 @@ describe("Style", () => {
     await task();
 
     expect(fs.existsSync(path.join(distDir, "styles.css"))).toBe(true);
-    expect(
-      fs.existsSync(path.join(distDir, "GitHub-Mark-Light-64px.png")),
-    ).toBe(true);
+    expect(fs.existsSync(path.join(distDir, "GitHub-Mark-Light-64px.png"))).toBe(true);
     expect(fs.existsSync(path.join(distDir, "favicon.ico"))).toBe(true);
   });
 });

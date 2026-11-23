@@ -46,9 +46,7 @@ export async function generateDemoHtml(
 /**
  * Build index HTML string from template without file I/O.
  */
-export async function buildIndexHtmlString(
-  demoPaths: string[],
-): Promise<string> {
+export async function buildIndexHtmlString(demoPaths: string[]): Promise<string> {
   const templatePath = path.resolve(__dirname, "../template/index.html");
   const template = await fsPromises.readFile(templatePath, "utf8");
 
@@ -73,10 +71,7 @@ export async function buildIndexHtmlString(
 /**
  * Generate the navigation index.html page.
  */
-export async function generateIndexHtml(
-  demoPaths: string[],
-  distDir: string,
-): Promise<void> {
+export async function generateIndexHtml(demoPaths: string[], distDir: string): Promise<void> {
   const html = await buildIndexHtmlString(demoPaths);
 
   await fsPromises.mkdir(distDir, { recursive: true });

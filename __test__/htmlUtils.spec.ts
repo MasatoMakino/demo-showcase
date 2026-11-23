@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { escapeHtmlAttr, replaceExtension } from "../src/htmlUtils.js";
 
 describe("escapeHtmlAttr", () => {
@@ -29,8 +29,6 @@ describe("replaceExtension", () => {
   });
 
   it("should handle subdirectory paths", () => {
-    expect(replaceExtension("sub/demo_file.ts", ".html")).toBe(
-      "sub/demo_file.html",
-    );
+    expect(replaceExtension("sub/demo_file.ts", ".html")).toBe("sub/demo_file.html");
   });
 });

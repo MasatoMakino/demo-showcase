@@ -28,11 +28,7 @@ export function createBuildConfig(
 /**
  * Build the base Vite configuration for dev mode.
  */
-export function createDevConfig(
-  root: string,
-  port: number,
-  host: string,
-): InlineConfig {
+export function createDevConfig(root: string, port: number, host: string): InlineConfig {
   return {
     root,
     base: "/",

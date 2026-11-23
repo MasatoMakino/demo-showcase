@@ -13,10 +13,7 @@ import type { InitializedOption } from "./Option.js";
  * Dev mode: Adds middleware to serve dynamically generated HTML pages.
  * Build mode: Not used directly - build orchestration handled by build.ts.
  */
-export function demoPlugin(
-  option: InitializedOption,
-  demoEntries: string[],
-): Plugin {
+export function demoPlugin(option: InitializedOption, demoEntries: string[]): Plugin {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
   const templateDir = path.resolve(__dirname, "../template/");
   const resolvedIndexScript = path.join(templateDir, "indexScript.js");
@@ -48,8 +45,7 @@ export function demoPlugin(
       // Trigger full reload when watched import targets change.
       // Skip declaration files to avoid spurious reloads from tsc output.
       server.watcher.on("change", (filePath) => {
-        if (filePath.endsWith(".d.ts") || filePath.endsWith(".d.ts.map"))
-          return;
+        if (filePath.endsWith(".d.ts") || filePath.endsWith(".d.ts.map")) return;
         for (const dir of importedDirs) {
           if (filePath.startsWith(dir)) {
             server.ws.send({ type: "full-reload", path: "*" });
@@ -60,12 +56,12 @@ export function demoPlugin(
 
       server.watcher.on("add", (filePath) => {
         if (isDemoFile(filePath, srcDir, option.prefix)) {
-          server.restart();
+          void server.restart();
         }
       });
       server.watcher.on("unlink", (filePath) => {
         if (isDemoFile(filePath, srcDir, option.prefix)) {
-          server.restart();
+          void server.restart();
         }
       });
 
@@ -77,10 +73,7 @@ export function demoPlugin(
         if (cleanUrl === "/" || cleanUrl === "/index.html") {
           try {
             const html = await buildIndexHtml(demoEntries);
-            const transformed = await server.transformIndexHtml(
-              "/index.html",
-              html,
-            );
+            const transformed = await server.transformIndexHtml("/index.html", html);
             res.setHeader("Content-Type", "text/html");
             res.end(transformed);
             return;
@@ -97,10 +90,7 @@ export function demoPlugin(
           if (entry) {
             try {
               const html = buildDemoHtml(entry, option);
-              const transformed = await server.transformIndexHtml(
-                cleanUrl,
-                html,
-              );
+              const transformed = await server.transformIndexHtml(cleanUrl, html);
               res.setHeader("Content-Type", "text/html");
               res.end(transformed);
               return;
@@ -113,10 +103,7 @@ export function demoPlugin(
 
         // Serve static assets from template dir
         const templateAssetPath = path.join(templateDir, cleanUrl);
-        if (
-          fs.existsSync(templateAssetPath) &&
-          fs.statSync(templateAssetPath).isFile()
-        ) {
+        if (fs.existsSync(templateAssetPath) && fs.statSync(templateAssetPath).isFile()) {
           const templateExt = path.extname(templateAssetPath);
           res.setHeader("Content-Type", lookupMimeType(templateExt));
           fs.createReadStream(templateAssetPath).pipe(res);
@@ -204,10 +191,7 @@ function buildDemoHtml(entry: string, option: InitializedOption): string {
 </html>`;
 }
 
-function findDemoEntry(
-  htmlName: string,
-  entries: string[],
-): string | undefined {
+function findDemoEntry(htmlName: string, entries: string[]): string | undefined {
   for (const entry of entries) {
     const htmlVersion = replaceExtension(entry, ".html");
     if (htmlName === htmlVersion) {

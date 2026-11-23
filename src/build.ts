@@ -28,9 +28,7 @@ export async function buildDemo(option: InitializedOption): Promise<void> {
     return;
   }
 
-  const stagingDir = await fsPromises.mkdtemp(
-    path.join(os.tmpdir(), "demo-showcase-"),
-  );
+  const stagingDir = await fsPromises.mkdtemp(path.join(os.tmpdir(), "demo-showcase-"));
 
   try {
     // Generate HTML entry points in staging directory
@@ -102,10 +100,7 @@ async function generateStagingHtml(
 /**
  * Generate index.html in staging directory.
  */
-async function generateStagingIndexHtml(
-  demoPaths: string[],
-  stagingDir: string,
-): Promise<void> {
+async function generateStagingIndexHtml(demoPaths: string[], stagingDir: string): Promise<void> {
   await generateIndexHtml(demoPaths, stagingDir);
 }
 
