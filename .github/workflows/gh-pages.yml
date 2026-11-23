@@ -28,7 +28,8 @@ jobs:
         uses: actions/setup-node@v7.1.0
         with:
           node-version: "22"
-          cache: "pnpm"
+          # A workflow that mints an OIDC token restores no cache.
+          package-manager-cache: false
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
