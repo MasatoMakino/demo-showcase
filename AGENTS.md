@@ -4,7 +4,7 @@ This file provides guidance to AI coding agents when working with code in this r
 
 ## Project Overview
 
-A CLI tool that generates demo HTML pages from JavaScript/TypeScript source files using Vite. Successor to `@masatomakino/gulptask-demo-page`, replacing webpack with Vite for native TS support and HMR dev server.
+A CLI tool that generates demo HTML pages from JavaScript/TypeScript source files using Vite.
 
 ## Development Environment
 
@@ -54,25 +54,11 @@ Each worktree has its own DevContainer. In a new worktree, run `devcontainer up 
 
 - `devcontainer exec --workspace-folder . pnpm run testRun` - Test the built CLI tool with default options
 
-### Code Quality
-
-- Uses Biome for formatting and linting
-- Template HTML files (`template/*.html`) are excluded from Biome checks (placeholder markers cause parse errors)
-
 ## Git Hooks
 
 Git runs on the host. The `pre-commit` hook in `.git/hooks/` passes the staged files to `pnpm run pre-commit` in the DevContainer of the working tree, and re-stages them. It finds the container by its `devcontainer.local_folder` label and starts the container when it is stopped. CI runs the tests and the lint on each PR, so there is no `pre-push` hook.
 
 ## Architecture
-
-### CLI Interface
-
-Two subcommands via Commander.js:
-
-```
-npx @masatomakino/demo-showcase dev [options]    # Live preview with HMR
-npx @masatomakino/demo-showcase build [options]   # Static site output
-```
 
 ### Core Components
 
@@ -101,7 +87,7 @@ npx @masatomakino/demo-showcase build [options]   # Static site output
 1. Discover demo source files
 2. Create Vite dev server with custom plugin middleware
 3. Plugin serves dynamically generated HTML pages
-4. Vite handles TS compilation (esbuild) and HMR natively
+4. Vite handles TS compilation and HMR natively
 5. File watcher detects new/removed demo files and restarts server
 
 ### File Structure Conventions
@@ -113,40 +99,7 @@ npx @masatomakino/demo-showcase build [options]   # Static site output
 
 ### Template Strategy
 
-Templates use plain HTML with `{{PLACEHOLDER}}` markers replaced by `HtmlGenerator.ts` via string replacement. No EJS dependency.
-
-### Testing
-
-- Uses Vitest for testing
-- Test files in `__test__/` directory
-- Tests include CLI functionality, HTML generation, file operations
-- `template/indexScript.js` tested via Node.js `vm` module (see `__test__/indexScript.spec.js`)
-
-## CLI Options Reference
-
-### Shared Options
-
-| Option              | Default         | Description                    |
-| ------------------- | --------------- | ------------------------------ |
-| `--prefix <string>` | `"demo"`        | Filename prefix for demo pages |
-| `--srcDir <path>`   | `"./demoSrc"`   | Demo source directory          |
-| `--distDir <path>`  | `"./docs/demo"` | Output directory (build mode)  |
-| `--body <string>`   | `""`            | HTML body content              |
-| `--style <string>`  | `""`            | Custom CSS styles              |
-
-### Dev-only Options
-
-| Option            | Default       | Description           |
-| ----------------- | ------------- | --------------------- |
-| `--port <number>` | `3456`        | Dev server port       |
-| `--open`          | `false`       | Open browser on start |
-| `--host <string>` | `"localhost"` | Dev server host       |
-
-## Key Configuration
-
-- TypeScript configuration: `tsconfig.json` (for CLI source compilation only)
-- Package exports: ES modules only (`"type": "module"`)
-- Build output uses relative paths (`base: './'`) for flexible deployment
+Templates use plain HTML with `{{PLACEHOLDER}}` markers replaced by `HtmlGenerator.ts` via string replacement.
 
 ## Task Completion Verification
 
