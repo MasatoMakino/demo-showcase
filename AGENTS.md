@@ -25,10 +25,7 @@ devcontainer stop --workspace-folder .
 
 ### Architecture
 
-- Base image: `node:26-bookworm-slim`, pinned by digest (via `.devcontainer/Dockerfile`)
-- Package manager: pnpm (installed globally in Dockerfile, same version as `packageManager`)
 - Security: an iptables firewall allows outbound traffic only to the npm registry. `.git`, `.devcontainer`, `.github`, `.claude`, `.vscode`, `CLAUDE.md`, and `AGENTS.md` are mounted read-only. `node_modules` is a named volume. See `.devcontainer/DESIGN.md`
-- Non-root user: `node` (UID:1000, GID:1000)
 
 ## Development Commands
 
@@ -47,8 +44,7 @@ Each worktree has its own DevContainer. In a new worktree, run `devcontainer up 
 ### Dev Server
 
 - `devcontainer exec --workspace-folder . pnpm run dev` - Start dev server (port 3456, host 0.0.0.0)
-- Find the container with `docker ps --filter label=devcontainer.local_folder=<absolute workspace path> --format '{{.Names}}'`, then run `docker port <container> 3456` to find the host port
-- See `dev-server-lifecycle` skill for stop procedure
+- See `dev-server-lifecycle` skill for the host port lookup and stop procedure
 
 ### CLI Testing
 
@@ -60,46 +56,7 @@ Git runs on the host. The `pre-commit` hook in `.git/hooks/` passes the staged f
 
 ## Architecture
 
-### Core Components
-
-- **CLI Entry Point**: `src/CLI.ts` - Thin CLI wrapper
-- **Command Runner**: `src/runCommand.ts` - Commander.js argument parsing (dev/build subcommands)
-- **Build Mode**: `src/build.ts` - Static site build orchestration via Vite
-- **Dev Mode**: `src/dev.ts` - Vite dev server with custom plugin
-- **Vite Config**: `src/ViteConfig.ts` - Vite config builder
-- **Demo Plugin**: `src/DemoPlugin.ts` - Custom Vite plugin (dev server middleware)
-- **HTML Generator**: `src/HtmlGenerator.ts` - HTML generation from templates; exports `buildIndexHtmlString()` (in-memory) and `generateIndexHtml()` (file write)
-- **HTML Utilities**: `src/htmlUtils.ts` - Shared utilities: `escapeHtmlAttr()`, `replaceExtension()`
-- **Entry Discovery**: `src/entries.ts` - Demo source file discovery
-- **File Operations**: `src/Clean.ts`, `src/Style.ts` - Asset management
-- **Options**: `src/Option.ts` - Option types and defaults
-
-### Build Flow
-
-1. Discover demo source files matching prefix pattern
-2. Create staging directory with generated HTML entry points
-3. Run `vite.build()` with MPA rollup inputs (assets referenced via `import` are bundled by Vite)
-4. Copy `indexScript.js` to dist (not bundled by Vite)
-5. Clean up staging directory
-
-### Dev Flow
-
-1. Discover demo source files
-2. Create Vite dev server with custom plugin middleware
-3. Plugin serves dynamically generated HTML pages
-4. Vite handles TS compilation and HMR natively
-5. File watcher detects new/removed demo files and restarts server
-
-### File Structure Conventions
-
-- Demo source files: `demoSrc/demo_*.ts` or `demoSrc/demo_*.js`
-- Templates: `template/` directory with plain HTML (placeholder markers `{{...}}`)
-- Output: `docs/demo/` directory (configurable)
-- Built CLI: `bin/` directory
-
-### Template Strategy
-
-Templates use plain HTML with `{{PLACEHOLDER}}` markers replaced by `HtmlGenerator.ts` via string replacement.
+See the `architecture-design` skill for the build and dev flows and the design rationale.
 
 ## Task Completion Verification
 
