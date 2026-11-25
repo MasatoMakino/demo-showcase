@@ -1,0 +1,1 @@
+Harmless file for a merge approval timeout test. Delete with the branch.
